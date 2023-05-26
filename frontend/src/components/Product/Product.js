@@ -121,6 +121,7 @@ const Product = () => {
         submitError.current = '입출고 목록에서 사용하고 있는 데이터입니다.';
       } else {
         setProducts(products.filter((product) => json.data.indexOf(product.code) == -1));
+        submitError.current = '';
       }
     });
     setSearchEvent((prev) => !prev);

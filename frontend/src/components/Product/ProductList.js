@@ -36,7 +36,7 @@ const ProductList = ({
 }) => {
   /** fetch, 즉 list를 출력하기 위한 state */
   const refForm = useRef(null);
-  const refAlertCheck = useRef(null);
+  const refAlertCheck = useRef('');
   /** Delete를 위한 체크박스 State */
   const [checkedButtons, setCheckedButtons] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
@@ -174,12 +174,12 @@ const ProductList = ({
     setCheckedButtons([]);
     setIsChecked(false);
     setItem({ code: '', name: '', phone: '' });
-    console.log(submitError.current);
-    submitError.current !== '' ? refAlertCheck.current = false : refAlertCheck.current = true;
 
-    submitError.current = '';   // clear
     // if (submitError.current === '') {
+    //   // 삭제 가능한 거
+
     // }
+    return submitError.current;
   };
 
   const handleWindowScroll = (event) => {
@@ -234,14 +234,18 @@ const ProductList = ({
                           confirmButtonText: '삭제',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                              onDeleteButton();
-                              console.log("화긴화긴+++", refAlertCheck.current);  // false: 백에서 null 리턴, 입출고에 사용되는 데이터 / true: 삭제 가능한 데이터
-                              if(refAlertCheck.current) {
-                                Swal.fire('Deleted!', '삭제가 완료되었습니다', 'success');
-                              }
-                              else {
-                                Swal.fire('', '입출고에서 사용되고 있는 데이터입니다.', 'error');
-                              }
+                              const returnData = onDeleteButton();
+                              
+                              returnData.then(result => {
+                                if(result === "") {
+                                  Swal.fire('Deleted!', '삭제가 완료되었습니다', 'success');
+                                }
+                                else {
+                                  Swal.fire('', '입출고에서 사용되고 있는 데이터입니다.', 'error');
+                                }
+                              });
+                              
+
                               
                             }
                             // else if(result.isConfirmed) {
