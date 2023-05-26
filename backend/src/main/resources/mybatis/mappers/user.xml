@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+	
+	<insert id="insert" parameterType="uservo">
+		<![CDATA[
+			INSERT INTO user 
+			VALUES(#{id},#{password},#{name},#{profile},#{phone},#{role}, true, #{insert_id},#{insert_ip},#{insert_dt},#{insert_id},#{insert_ip},#{insert_dt});
+	  	]]>
+	</insert>
+	
+	<select id="findByKeyword" resultType="uservo" parameterType="map">
+		<![CDATA[	
+			SELECT id,name,phone,profile
+			FROM user
+		]]>
+		 <where>
+            <choose>
+                <when test='uphone!=""'>
+                    <![CDATA[
+                        phone LIKE CONCAT('%',#{uphone },'%')
+                    ]]>
+                </when>
+                <otherwise>
+                    <![CDATA[
+                        (id LIKE CONCAT('%',#{ukeywd },'%')
+                        OR name LIKE CONCAT('%',#{ukeywd },'%'))
+                        AND state=true
+                    ]]>
+                </otherwise>
+            </choose>
+            <if test='ukeywd!="" and uphone!=""'>
+                <![CDATA[
+                    AND (id LIKE CONCAT('%',#{ukeywd },'%')
+                    OR name LIKE CONCAT('%',#{ukeywd },'%'))
+                    AND state=true
+                ]]>
+            </if>
+        </where>
+        <![CDATA[
+        AND id!='admin'AND id!=''
+        OFFSET #{offset} ROWS
+ 		FETCH NEXT #{limit} ROWS ONLY
+        ]]>
+	</select>
+	<select id="findUserModalByKeyword" resultType="uservo" parameterType="map">
+		<![CDATA[	
+			SELECT id,name,phone,profile
+			FROM user
+		]]>
+            <choose>
+                <when test='uphone!=""'>
+                    <![CDATA[
+                    	WHERE (id LIKE CONCAT('%',#{ukeywd },'%')
+                        OR name LIKE CONCAT('%',#{ukeywd },'%'))
+                        AND phone LIKE CONCAT('%',#{uphone },'%')
+                    	AND state=true
+                    ]]>
+                </when>
+                <otherwise>
+                    <![CDATA[
+                        WHERE (id LIKE CONCAT('%',#{ukeywd },'%')
+                        OR name LIKE CONCAT('%',#{ukeywd },'%'))
+                        AND state=true
+                    ]]>
+                </otherwise>
+            </choose>
+        <![CDATA[
+        AND id!='admin'AND id!=''
+        OFFSET #{offset} ROWS
+ 		FETCH NEXT #{limit} ROWS ONLY
+        ]]>
+	</select>
+	
+	<select id="findByCode" resultType="uservo"
+		parameterType="string">
+		<![CDATA[	
+			SELECT id,name, profile,phone
+			FROM user
+			WHERE id = #{code}
+		]]>
+		</select>
+		
+	<update id="updateByCode" parameterType="map">
+		<![CDATA[
+			UPDATE user
+			SET id=#{vo.id},name=#{vo.name},phone=#{vo.phone}
+		]]>
+		<if test='vo.password!="" and vo.password!=null'>
+                <![CDATA[
+                    ,password=#{vo.password}
+                ]]>
+            </if>
+		
+		<![CDATA[
+			WHERE id=#{ucode}
+		]]>
+	</update>
+		
+	<update id="updateMypageByCode" parameterType="map">
+	  <![CDATA[
+	    UPDATE user
+	  ]]>
+	  <choose>
+	    <when test="password != '' and profile!=''" >
+	      <![CDATA[
+	        SET password=#{vo.password}, name=#{vo.name}, phone=#{vo.phone}, profile=#{vo.profile}
+	      ]]>
+	    </when>
+	    <when test="password=='' and profile!=''">
+	      <![CDATA[
+	        SET name=#{vo.name}, phone=#{vo.phone}, profile=#{vo.profile}
+	      ]]>
+	    </when>
+	    <when test="password != '' and profile==''" >
+	      <![CDATA[
+	        SET password=#{vo.password}, name=#{vo.name}, phone=#{vo.phone}
+	      ]]>
+	    </when>
+	    <otherwise>
+	      SET id=#{ucode}, name=#{vo.name}, phone=#{vo.phone}
+	    </otherwise>
+	  </choose>
+	  <![CDATA[
+	    WHERE id=#{ucode}
+	  ]]>
+	</update>
+		
+	<select id="findUser" resultType="uservo" parameterType="uservo">
+		<![CDATA[
+			SELECT id, password, name, phone, role, insert_id,insert_ip, insert_dt 
+			FROM user
+			WHERE id=#{id} AND password=#{password}
+		]]>
+	</select>
+	
+	
+	<select id="getuserlogin" resultType="uservo" parameterType="uservo">
+		<![CDATA[
+			SELECT id, role
+		    FROM user
+		   	WHERE id=#{id} AND password=#{password}
+		]]>
+	</select>
+	
+	<select id="getUserfindById" resultType="uservo" parameterType="String">
+		<![CDATA[
+			SELECT id,password, role
+		    FROM user
+		    WHERE id=#{value} AND state=true
+		]]>
+	</select>
+	
+	<select id="getUserfindByIdDuplicate" resultType="uservo" parameterType="String">
+		<![CDATA[
+			SELECT id
+		    FROM user
+		    WHERE id=#{value}
+		]]>
+	</select>
+	
+	<select id="findByCodeForLocalStorage" resultType="uservo" parameterType="String">
+		<![CDATA[
+			SELECT id, name, profile, role
+		    FROM user
+		    WHERE id=#{value} 
+		]]>
+	</select>
+	
+	<delete id="deleteUsers" parameterType="String" >
+		<![CDATA[
+		    UPDATE user
+			SET state=false
+			WHERE id=#{value}
+		]]>
+	</delete>
+	
+</mapper>

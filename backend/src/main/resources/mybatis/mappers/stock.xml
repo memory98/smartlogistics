@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stock">
+
+	<select id="findbykeyword" parameterType="map" resultType="stockvo">
+	<![CDATA[	
+    SELECT * 
+      FROM ( SELECT tmp.date, tmp.state, tmp.insert_dt, tmp.master_code AS code, tmp.detail_no, u.name AS user_name, b.name AS business_name, tmp.product_code, p.name AS product_name, p.size, p.unit, tmp.count,
+		   COALESCE(LAG(tmp.ending_stock, 1) OVER (PARTITION BY product_code ORDER BY tmp.date,tmp.insert_dt),0 ) AS beginning_stock, tmp.ending_stock
+      FROM (
+		   SELECT rm.date, s.insert_dt, s.master_code, s.detail_no, rm.user_id, rm.business_code, s.product_code, s.state, s.count,
+				  SUM(CASE WHEN state = 'IS' THEN -1 * count ELSE count END) OVER (PARTITION BY product_code ORDER BY date, s.insert_dt ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS ending_stock
+			 FROM stock s 
+	    LEFT JOIN ( SELECT date, code, user_id, business_code FROM receive_master
+		 	     UNION ALL    
+			        SELECT date, code, user_id, business_code FROM release_master) rm 
+			  ON (s.master_code=rm.code) 
+	    ORDER BY date, s.insert_dt) AS tmp 
+INNER JOIN user u
+		ON tmp.user_id = u.id
+INNER JOIN business b
+		ON tmp.business_code = b.code
+INNER JOIN product p
+		ON tmp.product_code = p.code
+  ORDER BY tmp.date, tmp.insert_dt) A
+	 WHERE (date >= #{sdate}
+	   AND date <= #{edate}
+	   AND user_name LIKE CONCAT('%',#{user_name},'%')
+	   AND business_name LIKE CONCAT('%',#{business_name},'%')
+	   AND code LIKE CONCAT('%',#{code},'%')]]>
+		<choose>
+			<when test='!"ALL".equals(st)'>
+				<![CDATA[
+					AND state = #{st}
+                ]]>
+			</when>
+		</choose>
+	<![CDATA[
+       )
+ 	OFFSET #{offset} ROWS
+FETCH NEXT #{limit} ROWS ONLY
+	]]>
+	</select>
+	<select id="stock.getdata" parameterType="map" resultType="stockgraphvo">
+	<![CDATA[
+		(
+	SELECT A.date, COALESCE(E.state,'RV') AS state, COALESCE(E.count,0) AS count
+	  FROM (
+				SELECT CONCAT(]]>
+						<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date)) AS date
+	                               ]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date),
+	                                '-',
+	                                CASE 
+										WHEN EXTRACT(MONTH FROM date) < '10' 
+										THEN CONCAT('0',EXTRACT(MONTH FROM date))
+	                                ELSE EXTRACT(MONTH FROM date) END) AS date
+	                               ]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									D.date) AS date
+	                               ]]>
+							</otherwise>
+						</choose>
+	
+							<![CDATA[                             
+				  FROM(
+					SELECT DATE #{date} + INTERVAL n ]]>
+					<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									YEAR
+								]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									MONTH
+								]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									DAY
+								]]>
+							</otherwise>
+						</choose>
+				<![CDATA[
+					 AS date 
+					  FROM (
+							SELECT ROW_NUMBER() OVER () - 1 AS n 
+							  FROM INFORMATION_SCHEMA.COLUMNS
+						   ) AS nums 
+							 WHERE n BETWEEN 0 AND ]]>
+						<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									5
+								]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									12
+								]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									7
+								]]>
+							</otherwise>
+						</choose>
+							<![CDATA[) D
+		   ) A
+	 LEFT JOIN ( SELECT state, F._date AS date, F.count
+	   FROM (
+			SELECT 'RV' AS state, CONCAT( ]]>
+								<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date)) AS _date
+	                               ]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date),
+	                                '-',
+	                                CASE 
+										WHEN EXTRACT(MONTH FROM date) < '10' 
+										THEN CONCAT('0',EXTRACT(MONTH FROM date))
+	                                ELSE EXTRACT(MONTH FROM date) END) AS _date
+	                               ]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									date) AS _date
+	                               ]]>
+							</otherwise>
+						</choose>
+							<![CDATA[
+								, COUNT(date) AS count
+         	 FROM receive_master
+	 	 GROUP BY _date
+	   ) F	
+	   GROUP BY F._date
+	   ) E
+			ON A.date = E.date
+	  ORDER BY A.date
+	)
+	UNION ALL
+		(
+	SELECT A.date, COALESCE(E.state,'IS') AS state, COALESCE(E.count,0) AS count
+	  FROM (
+				SELECT CONCAT(]]>
+						<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date)) AS date
+	                               ]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date),
+	                                '-',
+	                                CASE 
+										WHEN EXTRACT(MONTH FROM date) < '10' 
+										THEN CONCAT('0',EXTRACT(MONTH FROM date))
+	                                ELSE EXTRACT(MONTH FROM date) END) AS date
+	                               ]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									D.date) AS date
+	                               ]]>
+							</otherwise>
+						</choose>
+	
+							<![CDATA[                         
+				  FROM(
+					SELECT DATE #{date} + INTERVAL n ]]>
+					<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									YEAR
+								]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									MONTH
+								]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									DAY
+								]]>
+							</otherwise>
+						</choose>
+				<![CDATA[
+					 AS date 
+					  FROM (
+							SELECT ROW_NUMBER() OVER () - 1 AS n 
+							  FROM INFORMATION_SCHEMA.COLUMNS
+						   ) AS nums 
+							 WHERE n BETWEEN 0 AND ]]>
+						<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									5
+								]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									12
+								]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									7
+								]]>
+							</otherwise>
+						</choose>
+							<![CDATA[) D
+		   ) A
+	 LEFT JOIN ( SELECT state, date, F.count
+	   FROM (
+			SELECT 'IS' AS state, CONCAT( ]]>
+								<choose>
+							<when test='"year".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date)) AS date
+	                               ]]>
+							</when>
+							<when test='"month".equals(state)'>
+								<![CDATA[
+									EXTRACT(YEAR FROM date),
+	                                '-',
+	                                CASE 
+										WHEN EXTRACT(MONTH FROM date) < '10' 
+										THEN CONCAT('0',EXTRACT(MONTH FROM date))
+	                                ELSE EXTRACT(MONTH FROM date) END) AS date
+	                               ]]>
+							</when>
+							<otherwise>
+								<![CDATA[
+									date) AS date
+	                               ]]>
+							</otherwise>
+						</choose>
+							<![CDATA[
+								, COUNT(date) AS count
+			  FROM release_master
+		  GROUP BY date
+	   ) F	
+	   GROUP BY F.date
+	   ) E
+			ON A.date = E.date
+	  ORDER BY A.date
+	)
+	
+		]]>
+	</select>
+</mapper>

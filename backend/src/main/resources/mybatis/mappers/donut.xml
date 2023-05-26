@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="donut">
+	  <select id="findByReceive" resultType="map" parameterType="map">
+	  <![CDATA[
+	  	SELECT A.all, B.todayall, C.my,C.code, C.business_code
+		FROM 
+			(	
+				SELECT count(*) AS 'all'
+				FROM receive_master
+			) AS A
+			
+			INNER JOIN
+    		
+    		(
+    		 	SELECT count(*) AS 'todayall'
+    			FROM receive_master
+    			WHERE DATE LIKE CONCAT(#{log.dt},"%")
+    		) AS B
+    		
+    		INNER JOIN
+    		
+    		(	
+    			SELECT count(*) AS 'my',code,business_code
+				FROM receive_master
+				WHERE user_id=#{log.id} AND DATE LIKE CONCAT(#{log.dt},"%")
+				ORDER BY DATE DESC
+			) AS C;
+	  ]]>
+	  </select>
+	
+</mapper>

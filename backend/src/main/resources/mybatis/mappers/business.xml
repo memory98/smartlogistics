@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="business">
+
+	<select id="findAll" resultType="businessvo">
+		<![CDATA[
+			SELECT code, name, phone, insert_ip, date_format(insert_dt, '%Y-%m-%d') AS insertDate
+			FROM business
+			WHERE state=true
+			ORDER BY code ASC
+		]]>
+	</select>
+	
+	<select id="findAllByKeyword" parameterType="map" resultType="businessvo">
+		<![CDATA[	
+			SELECT code, name, phone
+			FROM business
+		]]>
+		<choose>
+			<when test='vo.phone!=""'>
+			<![CDATA[
+				WHERE (code LIKE CONCAT('%',#{vo.code },'%')
+				OR name LIKE CONCAT('%',#{vo.code },'%'))
+				AND phone LIKE CONCAT('%',#{vo.phone },'%')
+				AND state=true
+			]]>
+			</when>
+			<otherwise>
+				<![CDATA[
+					WHERE (code LIKE CONCAT('%',#{vo.code },'%')
+					OR name LIKE CONCAT('%',#{vo.code },'%'))
+					AND state=true
+				]]>
+			</otherwise>
+		</choose>
+		<![CDATA[
+			ORDER BY code ASC
+		]]>	
+		<![CDATA[
+		OFFSET #{offset} ROWS
+		FETCH NEXT #{limit} ROWS ONLY
+		]]>	
+	</select>
+	
+	<insert id="insert" parameterType="map">
+		<![CDATA[
+			INSERT INTO business
+			VALUES (#{vo.code}, #{vo.name }, #{vo.phone }, true, #{log.id }, #{log.ip}, #{log.dt}, #{log.id }, #{log.ip}, #{log.dt})	
+	  	]]>	  		
+	</insert>
+	
+	<select id="findByCode" resultType="businessvo" parameterType="string">
+		<![CDATA[	
+			SELECT code, name, phone,state 
+			FROM business
+			WHERE code = #{code}
+		]]>
+	</select>
+	
+	<update id="updateByCode" parameterType="map">
+		<![CDATA[	
+			UPDATE business 
+			SET code=#{vo.code}, name=#{vo.name}, phone=#{vo.phone}, update_id=#{log.id}, update_ip=#{log.ip}, update_dt=#{log.dt}
+			WHERE code=#{bcode}
+		]]>
+	</update>
+	
+	<delete id="delete" parameterType="java.util.List">
+		<![CDATA[
+			UPDATE business
+			SET state=false
+			WHERE code IN
+		]]>
+			<foreach item="item" collection="list" open="(" separator="," close=")">
+				<![CDATA[
+					#{item}
+				]]>
+			</foreach>
+	</delete>
+	
+	
+	<select id="checkInReceive" resultType="receivemastervo" parameterType="java.util.List">
+		<![CDATA[
+			SELECT business_code
+			FROM receive_master
+			WHERE business_code IN
+		]]>
+		<foreach item="item" collection="list" open="(" separator=","
+			close=")">
+				<![CDATA[
+					#{item}
+				]]>
+		</foreach>
+	</select>
+	
+	<select id="checkInRelease" resultType="releasemastervo" parameterType="java.util.List">
+		<![CDATA[
+			SELECT business_code
+			FROM receive_master
+			WHERE business_code IN
+		]]>
+		<foreach item="item" collection="list" open="(" separator=","
+			close=")">
+				<![CDATA[
+					#{item}
+				]]>
+		</foreach>
+	</select>
+	
+</mapper>

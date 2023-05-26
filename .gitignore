@@ -1,0 +1,12 @@
+##maven
+**/target/
+**/build/
+**/out
+
+##eclipse
+**/.settings
+**/.classpath
+**/.project
+
+##node(javascrpit) project
+**/node_modules

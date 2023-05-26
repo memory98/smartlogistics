@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias
+			type="com.douzone.smartlogistics.vo.ProductVo" alias="productvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.BusinessVo" alias="businessvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.UserVo" alias="uservo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ReceiveMasterVo" alias="receivemastervo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ReceiveDetailVo" alias="receivedetailvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ModalReceiveMasterVo" alias="modalreceivemastervo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ModalReceiveDetailVo" alias="modalreceivedetailvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ModalReleaseMasterVo" alias="modalreleasemastervo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ReleaseMasterVo" alias="releasemastervo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.ReleaseDetailVo" alias="releasedetailvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.StockVo" alias="stockvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.StockGraphVo" alias="stockgraphvo" />
+			<typeAlias type="com.douzone.smartlogistics.vo.StatisticsVo" alias="statisticsvo" />
+			
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="mybatis/mappers/product.xml" />
+		<mapper resource="mybatis/mappers/business.xml" />
+		<mapper resource="mybatis/mappers/modalreceive.xml" />
+		<mapper resource="mybatis/mappers/user.xml" />
+		<mapper resource="mybatis/mappers/receive.xml" />
+		<mapper resource="mybatis/mappers/release.xml" />
+		<mapper resource="mybatis/mappers/stock.xml" />
+		<mapper resource="mybatis/mappers/donut.xml" />
+		
+	</mappers>
+</configuration>

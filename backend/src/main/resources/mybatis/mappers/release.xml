@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="release">
+	
+	<select id="findByKeyword" resultType="releasemastervo" parameterType="map">
+		<![CDATA[	
+			SELECT r.code, LEFT(r.date,10) AS 'date', u.name AS 'user_name', b.name AS 'business_name'
+			FROM release_master r  
+			INNER JOIN business b 
+			ON r.business_code=b.code
+			INNER JOIN user u
+			ON u.id= r.user_id
+			WHERE (b.name LIKE CONCAT('%',#{bname },'%') 
+			AND r.code LIKE CONCAT('%',#{rcode },'%')) 
+			AND DATE_FORMAT(r.date, '%Y-%m-%d') BETWEEN #{startdt} AND #{enddt}		
+			ORDER BY r.code
+			OFFSET #{offset} ROWS 
+			FETCH NEXT #{limit} ROWS ONLY
+		]]>
+		
+	</select>
+	
+	<select id="findByMasterNo" resultType="releasedetailvo" parameterType="string">
+		<![CDATA[
+			SELECT r.no, r.master_code, r.product_code, p.name AS 'product_name', p.size AS 'product_size', p.unit AS 'product_unit', r.count, r.receive_code
+			FROM release_detail r
+			INNER JOIN product p
+			ON r.product_code=p.code
+			INNER JOIN receive_detail rv
+			ON r.receive_detail_no = rv.no
+			WHERE r.master_code=#{rcode }
+		]]>
+	</select>
+	
+	<delete id="deleteMasterItem" parameterType="java.util.List">
+		<![CDATA[
+			DELETE
+			FROM release_master
+			WHERE code IN
+		]]>
+			<foreach item="item" collection="list" open="(" separator="," close=")">
+				<![CDATA[
+					#{item}
+				]]>
+			</foreach>
+	</delete>
+	
+	<delete id="deleteDetailByMasterNo" parameterType="java.util.List">
+		<![CDATA[
+			DELETE
+			FROM release_detail
+			WHERE master_code IN
+		]]>
+			<foreach item="item" collection="list" open="(" separator="," close=")">
+				<![CDATA[
+					#{item}
+				]]>
+			</foreach>
+	</delete>
+	
+	<delete id="deleteDetailItem" parameterType="java.util.List">
+		<![CDATA[
+			DELETE
+			FROM release_detail
+			WHERE no IN
+		]]>
+			<foreach item="item" collection="list" open="(" separator="," close=")">
+				<![CDATA[
+					#{item}
+				]]>
+			</foreach>
+	</delete>
+	
+	<delete id="deleteMasterByDetailNo" parameterType="string">
+		<![CDATA[
+			DELETE
+			FROM release_master
+			WHERE code=#{masterCode}
+		]]>
+	</delete>
+	
+	<delete id="stockDeleteByMasterCode" parameterType="java.util.List">
+		<![CDATA[
+			DELETE
+			FROM stock
+			WHERE master_code IN
+		]]>
+		
+			<foreach item="item" collection="list" open="(" separator="," close=")">
+				<![CDATA[
+					#{item}
+				]]>
+			</foreach>
+	</delete>
+	
+	<delete id="stockDeleteByDetailNo" parameterType="map">
+		<![CDATA[	
+			DELETE
+			FROM stock
+			WHERE master_code = #{code} 
+			AND detail_no IN 
+			
+		]]>
+			<foreach item="item" collection="no" open="(" separator="," close=")">
+				<![CDATA[
+					#{item}
+				]]>
+			</foreach>		
+	</delete>
+	
+	<update id="updateReleaseCountInReceiveByMasterCodeList" parameterType="java.util.List">
+		<![CDATA[
+			UPDATE receive_detail rd
+			JOIN (
+					SELECT receive_detail_no, count 
+					FROM release_detail WHERE master_code IN
+					]]>
+					<foreach item="item" collection="list" open="(" separator="," close=")">
+						#{item}
+					</foreach>
+		<![CDATA[
+			) a 
+			ON a.receive_detail_no = rd.no
+			SET rd.release_count = rd.release_count - a.count;
+		]]>	
+	</update>
+	
+	<update id="updateReleaseCountInReceiveByDetailNo" parameterType="java.util.List">
+		<![CDATA[
+			UPDATE receive_detail rcd
+			JOIN (
+					SELECT receive_detail_no, count 
+					FROM release_detail WHERE no IN
+					]]>
+					<foreach item="item" collection="list" open="(" separator="," close=")">
+						#{item}
+					</foreach>
+		<![CDATA[
+			) isd 
+			ON isd.receive_detail_no = rcd.no
+			SET rcd.release_count = rcd.release_count - isd.count;
+		]]>	
+	</update>
+	
+	
+	<select id="findSeqByDateAndState" resultType="int" parameterType="string">
+		<![CDATA[	
+			SELECT IF(MAX(no) IS NULL,1,(MAX(no)+1) )AS cnt FROM sequence WHERE date=#{date} and state="IS"
+		]]>
+	</select>
+	
+	<insert id="insertMaster" parameterType="map">
+		<![CDATA[
+			INSERT INTO release_master
+			VALUES (#{vo.code}, #{vo.date }, #{vo.businessCode}, #{vo.userId},#{log.id }, #{log.ip}, #{log.dt}, #{log.id }, #{log.ip}, #{log.dt})	
+	  	]]>	  		
+	</insert>
+	
+	<insert id="insertDetail" parameterType="receivedetailvo">
+		<![CDATA[
+			INSERT INTO release_detail
+			VALUES( null ,#{masterCode},#{productCode}, #{count}, #{receiveCode}, #{receiveDetailNo}, #{log.id }, #{log.ip}, #{log.dt}, #{log.id }, #{log.ip}, #{log.dt})
+	    ]]>	
+	    
+	    <selectKey keyProperty="no" resultType="long" keyColumn="no" order="AFTER">
+			<![CDATA[
+			select last_insert_id()
+			]]>
+		</selectKey>
+	  
+	</insert>
+	
+	<update id="updateReceiveCount" parameterType="map">
+		<![CDATA[
+			UPDATE receive_detail
+			SET release_count = release_count + #{count}
+			WHERE no = #{no}
+		]]>
+	</update>
+	
+	<insert id="insertSeq" parameterType="map" >
+		<![CDATA[
+			INSERT INTO sequence
+			VALUES (#{no}, #{state}, #{date},#{log.id }, #{log.ip}, #{log.dt}, #{log.id }, #{log.ip}, #{log.dt})	
+	  	]]>	  		
+	</insert>
+	<insert id="insertStock" parameterType="releasedetailvo">
+		<![CDATA[
+			INSERT INTO stock 
+			VALUES(#{masterCode},#{no},"IS",#{productCode},#{count},#{log.id }, #{log.ip}, #{log.dt}, #{log.id }, #{log.ip}, #{log.dt});
+	    ]]>		    	  
+	</insert>
+	
+	<select id="findByName" resultType="releasemastervo" parameterType="string">
+		<![CDATA[	
+		SELECT  r.code,LEFT(r.date,10) AS 'date',u.name AS 'user_name',u.id AS 'user_id',b.code AS 'business_code', b.name AS 'business_name'
+		FROM release_master r
+		INNER JOIN business b
+		ON r.business_code=b.code
+		INNER JOIN user u
+		ON r.user_id = u.id 			
+		WHERE u.name=#{name}
+		ORDER BY r.insert_dt
+        OFFSET 0 ROWS 
+		FETCH NEXT 5 ROWS ONLY
+		]]>
+	</select>
+	<select id="findByUserId" resultType="statisticsvo" parameterType="string">
+		<![CDATA[	
+			SELECT 
+			    COUNT(*) AS total_count,
+			    SUM(DATE(date) = CURDATE()) AS today_count,
+			    MIN(code) AS oldest_code,
+			    MIN(date) AS oldest_date,
+			    MAX(code) AS latest_code,
+			    MAX(date) AS latest_date
+			FROM
+			    release_master
+			WHERE
+			    user_id = #{id}
+		]]>
+	</select>
+	
+</mapper>

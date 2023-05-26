@@ -1,0 +1,133 @@
+# active spring boot profile
+spring:
+   profiles:
+      active: development
+
+
+
+---
+# common spring boot configuration
+spring:
+   mvc:
+      # Path pattern used for static resources
+      static-path-pattern: /assets/**
+
+      # Whether a "NoHandlerFoundException" should be thrown if no Handler was found to process a request
+      throw-exception-if-no-handler-found: true
+   web:
+      resources:
+         # Locations of static resources
+         static-locations: classpath:/assets/
+   thymeleaf:
+      prefix : classpath:templates/
+      check-template-location: true
+      mode: HTML5
+      suffix : .html
+      cache : false
+   servlet:
+      multipart:
+         enabled: true
+         max-file-size: 20MB
+         max-request-size: 100MB
+   # datasource
+   datasource:
+      driver-class-name: org.mariadb.jdbc.Driver
+      url: jdbc:mariadb://34.64.53.57:3306/smartlogistics?characterEncoding=utf8
+      username: user2
+      password: user2       
+      hikari:
+         minimum-idle: 10  
+         maximum-pool-size: 20 
+   # redis
+   redis:
+      host: localhost
+      port: 6379
+      
+# logging
+logging:
+   level:
+      root: INFO 
+
+jwt:
+  header: Authorization
+  secret: and0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdpLWp3dC10ZXN0LWFsamphYmFlZ2ktand0LXRlc3QtYWxqamFiYWVnaS1qd3QtdGVzdC1hbGpqYWJhZWdp
+  token-validity-in-seconds: 18000000
+         
+# mybatis
+mybatis:
+   config-location: classpath:mybatis/configuration.xml
+   mapper-locations: classpath:mybatis/mapper/*.xml
+---
+# development profile: spring boot configuration - Window OS
+spring:
+   config:
+      activate:
+         on-profile: development-window
+   web:
+      resources:
+         static-locations: classpath:/assets/, file:./smartlogistics-uploads/
+   # devtools - live reload
+   devtools:
+      livereload:
+         enabled: true
+
+
+
+# server
+server:
+   port: 8080
+   servlet:
+      context-path: /
+      encoding:
+         charset: UTF-8
+         enabled: true
+         
+---
+# development profile: spring boot configuration - Mac OS
+spring:
+   config:
+      activate:
+         on-profile: development-mac
+   web:
+      resources:
+         static-locations: classpath:/assets/, file:./Users/yoon/smartlogistics-uploads/
+   # devtools - live reload
+   devtools:
+      livereload:
+         enabled: true
+
+
+
+# server
+server:
+   port: 8080
+   servlet:
+      context-path: /
+      encoding:
+         charset: UTF-8
+         enabled: true
+         
+---
+
+# production profile: spring boot configuration
+spring:
+   config:
+      activate:
+         on-profile: production
+   web:
+      resources:
+         static-locations: classpath:/assets/, file:./smartlogistics-uploads/
+   datasource:
+      driver-class-name: org.mariadb.jdbc.Driver
+      url: jdbc:mariadb://34.64.53.57:3306/smartlogistics?characterEncoding=utf8
+      username: user2
+      password: user2    
+      
+# server
+server:
+   port: 8080
+   servlet:
+      context-path: /
+      encoding:
+         charset: UTF-8
+         enabled: true

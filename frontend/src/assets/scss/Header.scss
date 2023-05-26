@@ -1,0 +1,34 @@
+@charset "utf-8";
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+}
+.header {
+    --length: 80px;
+    --fontSize: 40px;
+    margin:20px;
+    height: var(--length);
+    text-align: center;
+    line-height: var(--length);
+    .amaranth10 {
+        font-family: 'Black Han Sans', sans-serif;
+        font-size: var(--fontSize);
+        display:block;
+        float: left;
+    }
+    #amaranth {
+        width: auto;
+        color: #000;
+        font-family: 'Black Han Sans', sans-serif;
+
+    }
+    
+    #logoNumber {
+        color: #117AEF;
+        font-family: 'Black Han Sans', sans-serif;
+
+    }
+}
+    
