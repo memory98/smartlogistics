@@ -22,7 +22,7 @@
 	
 	<select id="findByMasterNo" resultType="releasedetailvo" parameterType="string">
 		<![CDATA[
-			SELECT r.no, r.master_code, r.product_code, p.name AS 'product_name', p.size AS 'product_size', p.unit AS 'product_unit', r.count, r.receive_code
+		SELECT r.no, r.master_code, r.product_code, p.name AS 'product_name', p.size AS 'product_size', p.unit AS 'product_unit', r.count, r.receive_code, rv.receive_count,rv.release_count, (rv.receive_count-rv.release_count) as stockCnt
 			FROM release_detail r
 			INNER JOIN product p
 			ON r.product_code=p.code

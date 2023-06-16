@@ -43,7 +43,7 @@ const Graph = () => {
               marginLeft: "10px",
             }}
           >
-            현황리스트
+            현황그래프
           </span>
         </Box>
 

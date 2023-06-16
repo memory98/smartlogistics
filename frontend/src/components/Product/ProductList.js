@@ -136,13 +136,13 @@ const ProductList = ({
 
   const handleCheckboxClick = (event) => {
     event.stopPropagation();
-    setItem({ code: '', name: '', phone: '' });
+    setItem({ code: '', name: '', size: '', unit: '' });
   };
 
   //삭제 모달 관련
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
-    setItem({ code: '', name: '', phone: '' });
+    setItem({ code: '', name: '', size: '', unit: '' });
     setOpen(true);
   };
 
@@ -160,7 +160,7 @@ const ProductList = ({
       return '품목 전체를 삭제하시겠습니까?';
     }
     if (length === 0) {
-      return '체크된 데이터가 존재하지 않습니다.';
+      return 0;
     }
     if (length === 1) {
       console.log(checkedButtons);
@@ -171,9 +171,8 @@ const ProductList = ({
 
   const onDeleteButton = async () => {
     await deleteItemHandler(checkedButtons);
-    setCheckedButtons([]);
-    setIsChecked(false);
-    setItem({ code: '', name: '', phone: '' });
+    
+    setItem({ code: '', name: '', size: '', unit: '' });
 
     // if (submitError.current === '') {
     //   // 삭제 가능한 거
@@ -225,7 +224,8 @@ const ProductList = ({
         <Box sx={{ width: '97%', display: 'flex' }}>
           <DeleteIcon sx={{ padding: '7px', cursor: 'pointer', marginLeft: 'auto' }} 
                       onClick={() => {
-                        Swal.fire({
+                        modalMessage() === 0 ? Swal.fire('', '체크된 데이터가 존재하지 않습니다.', 'warning') 
+                        : Swal.fire({
                           text: modalMessage(), // modalMessage()
                           icon: 'question',
                           showCancelButton: true,
@@ -239,23 +239,16 @@ const ProductList = ({
                               returnData.then(result => {
                                 if(result === "") {
                                   Swal.fire('Deleted!', '삭제가 완료되었습니다', 'success');
+                                  setCheckedButtons([]);
+                                  setIsChecked(false);
                                 }
                                 else {
                                   Swal.fire('', '입출고에서 사용되고 있는 데이터입니다.', 'error');
                                 }
-                              });
-                              
-
-                              
+                              });  
                             }
-                            // else if(result.isConfirmed) {
-                            //   Swal.fire(
-                            //     '',
-                            //     '입출고에서 사용되고 있는 데이터입니다.',
-                            //     'error',
-                            //   )
-                            // }
-                        })}} />
+                        })}}
+          />
         </Box>
         <FormControl component="form" id="table" onSubmit={handleSubmit} ref={refForm}>
           <TableContainer

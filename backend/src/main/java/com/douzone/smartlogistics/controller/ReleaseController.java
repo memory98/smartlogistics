@@ -113,7 +113,7 @@ public class ReleaseController {
 	// release detail insert
 	@PostMapping("/insertdetail")
 	public ResponseEntity<JsonResult> insertReleaseDetail(@RequestBody List<ReleaseDetailVo> releaseDetailVo, @DBLog DBLogVo logVO) {
-
+		for(ReleaseDetailVo v : releaseDetailVo) System.out.println(v);
 		releaseService.insertDetail(releaseDetailVo, logVO);
 		return ResponseEntity.status(HttpStatus.OK).body(JsonResult.success(releaseDetailVo));
 	}

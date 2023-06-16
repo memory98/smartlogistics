@@ -42,5 +42,9 @@ public class ProductRepository {
 	public List<ReleaseDetailVo> checkInRelease(List<String> deleteItem) {
 		return sqlSession.selectList("product.checkInRelease",deleteItem);
 	}
+	public List<String> findpCodeByReceiveDetail(String productkeywd, String productSize, Long offset, Long limit) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

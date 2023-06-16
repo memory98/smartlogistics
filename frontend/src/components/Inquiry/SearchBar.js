@@ -120,7 +120,7 @@ const SearchBar = ({ state, setState, searchKeyword, searchKw }) => {
             }}
             onClick={(e) => {
               setState(true);
-              searchKw.current = ({ user_name: '', business_name: '', code: '', startdt: '', enddt: '', st:'ALL' });
+              searchKw.current = ({ user_name: '', business_name: '', code: '', startdt: '', enddt: '', st: 'ALL' });
             }}
           >
             <FormatListBulletedIcon sx={{ fontSize: 20 }} />
@@ -165,7 +165,7 @@ const SearchBar = ({ state, setState, searchKeyword, searchKw }) => {
               }}
             >
 
-              <label style={{ fontSize: '0.9rem'}}>
+              <label style={{ fontSize: '0.9rem' }}>
                 담당자</label>
               <TextField
                 type='text'
@@ -201,86 +201,84 @@ const SearchBar = ({ state, setState, searchKeyword, searchKw }) => {
               />
               <label style={{ fontSize: '0.9rem' }}>
                 기간</label>
-              <LocalizationProvider 
-                dateAdapter={AdapterDayjs} 
-                sx={{ 
-                  height: '60px',
-                }}>
-                <DemoContainer
-                  components={['DatePicker']}
-                  sx={{
-                    p: 0,
-                    minWidth: 0,
-                    '& .css-1xhypcz-MuiStack-root': {
+                <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            sx={{ height: "60px" }}
+          >
+            <DemoContainer
+              components={["DatePicker"]}
+              sx={{
+                p: 0,
+                minWidth: 0,
+                "& .MuiStack-root": {
+                  padding: 0,
+                },
+              }}
+            >
+              <DatePicker
+                maxDate={searchTextFiled.enddt || dayjs().subtract(-6, "day")}
+                format="YYYY-MM-DD"
+                slotProps={{
+                  textField: { size: "small", style: { minWidth: "unset" } },
+                }}
+                sx={{
+                  minWidth: 0,
+                  paddingLeft: 2,
+                  overflow: "hidden",
+                  "& .MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputSizeSmall.MuiInputBase-inputAdornedEnd":
+                    {
                       padding: 0,
-                    }
-                  }}
-                >
-                  <DatePicker
-                    format="YYYY-MM-DD"
-                    slotProps={{
-                      textField: { size: 'small', style: { minWidth: 'unset' } },
-                    }}
-                    sx={{
-                      minWidth: 0,
-                      paddingLeft: 2,
-                      overflow: 'hidden',
-                      '& .css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input': {
-                        padding: 0,
-                        height: '1em',
-                        width: 105,
-                        marginLeft: '10px',
-                      },
-                      '& .css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root': {
-                        width: '165px',
-                      },
-                      '& .css-e1omjc-MuiStack-root>.MuiTextField-root': {
-                        minWidth: 0,
-                        height: '35px',
-                      }
-                    }}
-                    onAccept={handleAcceptStart}
-                    value={searchTextFiled.startdt === '' ? dayjs().subtract(6, 'day') : dayjs(searchTextFiled.startdt)}
-                  ></DatePicker>
-                  <span>~</span>
-                  <DatePicker
-                    readOnly={searchKw.sDate === '' || searchKw.sDate === null}
-                    style={{
-                      '& .css-3tvb69-MuiStack-root>.MuiTextField-root': {
-                        minWidth: 0,
-                        p: 0,
-                        backgroundColor: '#333',
-                      },
-                    }}
-                    format="YYYY-MM-DD"
-                    slotProps={{
-                      textField: { size: 'small' },
-                    }}
-                    sx={{
-                      minWidth: 0,
-                      paddingLeft: 2,
-                      overflow: 'hidden',
-                      '& .css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input': {
-                        padding: 0,
-                        height: '1em',
-                        width: 105,
-                        marginLeft: '10px',
-                      },
-                      '& .css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root': {
-                        width: '165px',
-                      },
-                      '& .css-e1omjc-MuiStack-root>.MuiTextField-root': {
-                        minWidth: 0,
-                        height: '35px',
-                      }
-                    }}
-                    minDate={searchKw.startdt || dayjs().subtract(6, 'day')} onAccept={handleAcceptEnd}
-                    value={searchTextFiled.enddt === '' ? dayjs().add(6, 'day') : dayjs(searchTextFiled.enddt)}
-                  ></DatePicker>
+                      height: "1em",
+                      width: 105,
+                      marginLeft: "10px",
+                    },
+                  "& .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-sizeSmall.MuiInputBase-adornedEnd":
+                    {
+                      width: "165px",
+                      height: "30px",
+                    },
+                }}
+                onAccept={handleAcceptStart}
+                value={
+                  searchTextFiled.startdt === ""
+                    ? dayjs().subtract(6, "day")
+                    : dayjs(searchTextFiled.startdt)
+                }
+              ></DatePicker>
+              <span style={{ alignSelf: "center" }}>~</span>
+              <DatePicker
+                format="YYYY-MM-DD"
+                slotProps={{
+                  textField: { size: "small" },
+                }}
+                sx={{
+                  minWidth: 0,
+                  paddingRight: 5,
+                  overflow: 'hidden',
+                  "& .MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputSizeSmall.MuiInputBase-inputAdornedEnd":
+                    {
+                      padding: 0,
+                      height: "1em",
+                      width: 105,
+                      marginLeft: "10px",
+                    },
+                  "& .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-sizeSmall.MuiInputBase-adornedEnd":
+                    {
+                      width: "165px",
+                      height: "30px",
+                    },
+                }}
+                minDate={searchTextFiled.startdt || dayjs().subtract(6, "day")}
+                onAccept={handleAcceptEnd}
+                value={
+                  searchTextFiled.enddt === ""
+                    ? dayjs().add(6, "day")
+                    : dayjs(searchTextFiled.enddt)
+                }
+              ></DatePicker>
                 </DemoContainer>
               </LocalizationProvider>
             </Box>
-
             <Button type='submit' variant='outlined' sx={{ marginRight: 6 }}>
               <SearchIcon />
             </Button>

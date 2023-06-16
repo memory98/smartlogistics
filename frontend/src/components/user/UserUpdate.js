@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import sha256 from "sha256";
+import Swal from "sweetalert2";
 
 export default function UserUpdate({
   itemUpdateHandler,
@@ -47,20 +48,50 @@ export default function UserUpdate({
   const onSubmitHandler = (e) => {
     e.preventDefault();
     const obj = { ...item };
+    console.log(obj);
+    if (obj.id === "" || obj.id === undefined || obj.id === null) {
+      Swal.fire({
+        title: "",
+        text: `정보를 수정할 유저를 선택해주세요`,
+        icon: "warning",
+      });
+      return;
+    }
     if (
       obj.password !== "" &&
       obj.password !== undefined &&
       !/^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{9,20}$/g.test(obj.password)
     ) {
-      alert(
-        "비밀번호 양식 오류!\n영어, 숫자를 포함한 최소 9자 최대 20자여야 합니다."
-      );
+      Swal.fire({
+        title: "",
+        text: `비밀번호 양식 오류!\n영어, 숫자를 포함한 최소 9자 최대 20자여야 합니다.`,
+        icon: "warning",
+      });
+      return;
+    }
+    if (obj.name === "" || obj.name === undefined) {
+      Swal.fire({
+        title: "",
+        text: `이름을 입력해 주세요.`,
+        icon: "warning",
+      });
+      setItem({ ...item, name: userDetail.name });
+      return;
+    }
+    if (obj.phone === "" || obj.phone === undefined || obj.phone.length < 13) {
+      Swal.fire({
+        title: "",
+        text: `핸드폰 번호 양식이 잘못되었습니다.`,
+        icon: "warning",
+      });
+      setItem({ ...item, phone: userDetail.phone });
       return;
     }
 
     if (obj.password !== "" && obj.password !== undefined) {
       obj.password = sha256(obj.password);
     }
+
     itemUpdateHandler(obj, target);
     setItem({ code: "", name: "", phone: "" }); // update form data 초기화
   };

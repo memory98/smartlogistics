@@ -19,12 +19,13 @@ import React, { useState, useEffect } from "react";
 import DetailItem from "./DetailItem";
 import checkImg from "../../assets/img/checkmark.png";
 import SearchIcon from "@mui/icons-material/Search";
+import Swal from 'sweetalert2';
 
 /** 테이블 Header 고정을 위한 styled component 사용 */
 // top의 px값은 첫 행의 높이와 같게
 const TableStickyTypeCell = styled(TableCell)`
   && {
-    top: 43px;
+    top: 39px;
     p: 0;
     height: 30px;
   }
@@ -40,7 +41,10 @@ const ReleaseDetail = ({
     filteredDetails,
     openDeleteModalInDetail,
     openReleaseInsert,
-    detailInput
+    detailInput,
+    deleteDetailHandler,
+    deleteObj,
+    modalDetailMessage
   }) => {
     /** 모두 선택해주는 체크박스 (detail header부분의 체크박스) */
     const detailAllCheckBox = (checked) => {
@@ -110,7 +114,20 @@ const ReleaseDetail = ({
               marginLeft: "auto",
             }}
             onClick={() => {
-              filteredDetails.length > 0 ? toggleModal(openDeleteModalInDetail, 'deleteDetail') : toggleModal(openNullModal, 'null')
+              modalDetailMessage() === 0 ? Swal.fire('', '체크된 데이터가 존재하지 않습니다.', 'warning') 
+            : Swal.fire({
+              text: modalDetailMessage(),
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: '삭제',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteDetailHandler(deleteObj);
+                  Swal.fire('Deleted!', '삭제가 완료되었습니다', 'success');  
+                }
+            })
             }}
           />
         </Box>

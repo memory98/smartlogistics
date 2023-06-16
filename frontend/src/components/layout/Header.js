@@ -61,6 +61,13 @@ const Header = ({ info }) => {
                 float: "right",
                 p: 0,
                 marginRight: -1.5,
+                bgcolor: 'transparent',
+                '&:hover': {
+                  bgcolor: 'transparent',
+                },
+                '&:active': {
+                  backgroundColor: 'transparent', 
+                },
               }}
             >
               <Logo />

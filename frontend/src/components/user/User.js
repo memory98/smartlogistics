@@ -4,6 +4,7 @@ import UserSerchBar from "./UserSerchBar";
 import UserUpdate from "./UserUpdate";
 import { Box, Grid } from "@mui/material";
 import { customFetch } from "../custom/customFetch";
+import Swal from "sweetalert2";
 
 const User = () => {
   const submitError = useRef("");
@@ -14,6 +15,14 @@ const User = () => {
     ukeywd: "",
     uphone: "",
   });
+
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .custom-swal-container {
+      z-index: 9999; /* 원하는 z-index 값으로 설정 */
+    }
+  `;
+  document.head.appendChild(style);
 
   const changeSearchKwdEvent = () => {
     searchKw.current = searchTextFiled;
@@ -95,13 +104,25 @@ const User = () => {
     });
     console.log(json.data);
     if (json.result === "fail") {
+      Swal.fire({
+        title: "",
+        text: "이미 등록되어 있는 아이디 입니다.",
+        icon: "warning",
+        customClass: {
+          container: "custom-swal-container",
+        },
+      });
       return false;
     }
     let object = {};
     const { id, name, phone } = json.data;
     object = { id, name, phone };
     setUsers([...users, object]);
-    alert(name + " 유저 회원가입 성공");
+    Swal.fire({
+      title: "",
+      text: `${name} 유저 회원가입 성공`,
+      icon: "success",
+    });
     return true;
   };
 
@@ -113,7 +134,11 @@ const User = () => {
     }).then(() =>
       setUsers((prev) => prev.map((user) => (user.id === target ? item : user)))
     );
-    alert(target + " 유저 정보 변경 완료");
+    Swal.fire({
+      title: "",
+      text: `${target} 유저 정보 변경 완료`,
+      icon: "success",
+    });
   };
 
   const userDetail = async (id) => {

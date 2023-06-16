@@ -45,7 +45,7 @@ public class ReleaseRepository {
 
 	/* Detail Item 삭제 */
 	public boolean deleteDetailItem(List<Integer> detailNo) {
-		return 1 == sqlSession.delete("release.deleteDetailItem", detailNo);
+		return 0 < sqlSession.delete("release.deleteDetailItem", detailNo);
 	}
 	
 	public boolean deleteMasterByDetailNo(String masterCode) {
@@ -58,7 +58,7 @@ public class ReleaseRepository {
 
 	public boolean deleteStockByDetailNo(String masterCode, List<Integer> detailNo) {
 		Map<String, Object> map = Map.of("code", masterCode, "no", detailNo);
-		return 1 == sqlSession.delete("release.stockDeleteByDetailNo", map);
+		return 0 < sqlSession.delete("release.stockDeleteByDetailNo", map);
 	}
 	
 	public boolean updateReleaseCountInReceiveDetail(List<String> masterNo) {
@@ -66,7 +66,7 @@ public class ReleaseRepository {
 	}
 	
 	public boolean updateReleaseCountInReceive(List<Integer> detailNo) {
-		return 1 == sqlSession.update("release.updateReleaseCountInReceiveByDetailNo", detailNo);
+		return 0 < sqlSession.update("release.updateReleaseCountInReceiveByDetailNo", detailNo);
 	}
 	public int findSeqByDateAndState(String date) {
 		return sqlSession.selectOne("release.findSeqByDateAndState", date);

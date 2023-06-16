@@ -37,8 +37,6 @@ const Inquiry = () => {
 
     let startdt = '';
     let enddt = '';
-    console.log(searchKw.current,searchKw.current.startdt,searchKw.current.enddt)
-    console.log(searchKw.current && searchKw.current.startdt !== '' && searchKw.current.enddt !== '')
 
     if (searchKw.current && searchKw.current.startdt === '' && searchKw.current.enddt !== '') {
       startdt = format(dayjs().subtract(6, 'day').$d, 'yyyy-MM-dd');
@@ -59,20 +57,14 @@ const Inquiry = () => {
 
     setIsFetching(true);
     const limit = 20;
-    console.log('startIndex', startIndex.current);
-    console.log('limit', limit);
-    console.log('st',searchKw.current.st)
     var url = `/api/inquiry/list?offset=${startIndex.current}&limit=${limit}&st=${searchKw.current.st}`;
     if (searchKw) {
       url = `/api/inquiry/list?offset=${startIndex.current}&limit=${limit}&sdt=${startdt}&edt=${enddt}&st=${searchKw.current.st}&user_name=${searchKw.current.user_name}&business_name=${searchKw.current.business_name}&code=${searchKw.current.code}`;
     }
-
-    console.log(url);
-
+    console.log('url',url)
     await customFetch(url, {
       method: "get",
     }).then((json) => {
-      console.log('json.data', json.data);
       setList(pre => [...pre, ...json.data]);
 
       if (json.data !== null) {
@@ -98,8 +90,6 @@ const Inquiry = () => {
           setState={setState}
           searchKeyword={searchKeyword}
           searchKw={searchKw}
-          // searchTextFiled={searchTextFiled}
-          // setSearchTextFiled={setSearchTextFiled}
         />
         {
           state
@@ -110,7 +100,6 @@ const Inquiry = () => {
               searchKw={searchKw}
               searchKeyword={searchKeyword}
               loading={loading}
-              // setSearchTextFiled={setSearchTextFiled}
             />
             :
             <Graph />

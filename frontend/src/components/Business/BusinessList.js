@@ -37,9 +37,11 @@ function BusinessList({
   businessDetail,
   setItem,
   searchKeyword,
+  deleteItemHandler,
   loading,
   rowColor,
   setDetail,
+  submitError,
 }) {
   // const [newDatas, setNewDats] = useState({code: '', name:'', phone:''});
   /** fetch, 즉 list를 출력하기 위한 state */
@@ -100,24 +102,6 @@ function BusinessList({
     }
   };
 
-  /** 삭제 api */
-  const deleteItemHandler = async (data) => {
-    await customFetch(`/api/business/delete`, {
-      method: "post",
-      body: JSON.stringify(data),
-    }).then((json) => {
-      json.data === null
-        ? alert(
-            "사용되고 있는 데이터입니다. 입﹒출고를 완료한 후 삭제를 해주세요."
-          )
-        : setBusinesses(
-            businesses.filter(
-              (business) => json.data.indexOf(business.code) == -1
-            )
-          );
-    });
-  };
-
   const handleWindowScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.target;
 
@@ -148,15 +132,15 @@ function BusinessList({
         setCodeChk(true);
         refForm.current.reset();
         setPhone("");
-        alert("등록되었습니다.");
+        Swal.fire('', '거래처가 추가되었습니다.', 'success');
         setDetail([]);
       } else {
         setCodeChk(false);
         console.log(json.data.vo.state);
         if (json.data.vo.state === "1") {
-          alert("이미 등록되어 있는 데이터 입니다");
+          Swal.fire('', '이미 등록되어 있는 데이터 입니다.', 'warning');
         } else if (json.data.vo.state === "0") {
-          alert("삭제된 데이터 거래처코드와 동일합니다.");
+          Swal.fire('', '삭제된 데이터 코드와 동일합니다.', 'warning');
         }
       }
     });
@@ -238,7 +222,7 @@ function BusinessList({
       return "거래처 전체를 삭제하시겠습니까?";
     }
     if (length === 0) {
-      return "선택한 데이터가 없습니다.";
+      return 0;
     }
     if (length === 1) {
       console.log(checkedButtons);
@@ -247,9 +231,11 @@ function BusinessList({
     return length + "개의 거래처를 삭제하시겠습니까?";
   };
 
-  const onDeleteButton = () => {
-    deleteItemHandler(checkedButtons);
-    handleClose();
+  const onDeleteButton = async () => {
+    await deleteItemHandler(checkedButtons);
+    setItem({ code: '', name: '', phone: '' });
+
+    return submitError.current;
   };
 
   const swal = (icon, title, text) => {
@@ -290,7 +276,31 @@ function BusinessList({
         <Box sx={{ width: "97%", display: "flex" }}>
           <DeleteIcon
             sx={{ padding: "7px", cursor: "pointer", marginLeft: "auto" }}
-            onClick={handleOpen}
+            onClick={() => {
+              modalMessage() === 0 ? Swal.fire('', '체크된 데이터가 존재하지 않습니다.', 'warning') 
+              : Swal.fire({
+                text: modalMessage(), // modalMessage()
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '삭제',
+              }).then((result) => {
+                  if (result.isConfirmed) {
+                    const returnData = onDeleteButton();
+                    
+                    returnData.then(result => {
+                      if(result === "") {
+                        Swal.fire('Deleted!', '삭제가 완료되었습니다', 'success');
+                        setCheckedButtons([]);
+                        setIsChecked(false);
+                      }
+                      else {
+                        Swal.fire('', '입출고에서 사용되고 있는 데이터입니다.', 'error');
+                      }
+                    });  
+                  }
+              })}}
           />
         </Box>
         <FormControl

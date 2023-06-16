@@ -88,25 +88,7 @@ const Release = () => {
     }
   };
 
-  /** checkedRow 수정을 확인하기 위한 useEffect - 별다른 기능 없음 */
-  useEffect(() => {
-    console.log('==== row ==== ');
-    console.log(checkedRow);
-  }, [checkedRow]);
-
-  useEffect(() => {
-    console.log(' ===== inputMaster =====');
-    console.log(inputMaster);
-  }, [inputMaster]);
-
-  useEffect(() => {
-    console.log(' ===== releaseMaster ===== ');
-    console.log(releaseMaster);
-  }, [releaseMaster]);
-
   const handleButtonClick = (key, data) => {
-    console.log(' ===== handleButtonClick 데이터 출력 ===== ');
-    console.log(key, data);
     if (key === 'releaseInsert') {
       setOpenReleaseInsert(false);
     } else if (key === 'manager') {
@@ -191,10 +173,23 @@ const Release = () => {
     }
 
     await customFetch(url, { method: 'get' }).then((json) => {
-      console.log("==== JSON DATA ===== ");
-      console.log(json.data);
+
       setreleaseMaster((pre) => [...pre, ...json.data]);
-      setCheckedRow(json.data.map((item) => ({ master: item.code, state: 'f', detail: [{ no: '', state: 'f' }] })));
+      setCheckedRow((pre) => {    // pre, json.data가 중복되는 에러가 있어서 중복 제거하고 setCheckedRow
+        const existingCodes = pre.map((item) => item.master);
+        const newData = json.data.filter((item) => !existingCodes.includes(item.code));
+      
+        const updatedData = [
+          ...pre,
+          ...newData.map((item) => ({
+            master: item.code,
+            state: 'f',
+            detail: [{ no: '', state: 'f' }],
+          })),
+        ];
+      
+        return updatedData;
+      });
       // 넘어온 데이터의 master code 값 담기
       // rowColor.current = ''; // Master 행 선택 시 Background Color 변경했던 거 Clear
   
@@ -253,6 +248,8 @@ const Release = () => {
 
     var url = '';
     var data = '';
+
+    selectList.map((item) => console.log(item));
     /* vo에 담기 위해서 detailVo 형태로 key값 변경 */
     const transformedList = selectList.map((item) => ({
       receiveDetailNo: item.no,
@@ -261,6 +258,7 @@ const Release = () => {
       productName: item.pname,
       productSize: item.psize,
       productUnit: item.punit,
+      stockCnt: item.stCnt,
       count: item.releaseCnt,
     }));
     // 어느 Master도 클릭하지 않은 상태에서 오로지 추가만 할 때
@@ -271,7 +269,6 @@ const Release = () => {
         releaseDetails: transformedList,
       };
     } else {
-      console.log('====== insert Detail ====== ');
       // release Detail Insert
       url = '/api/release/insertdetail';
       data = transformedList.map((obj) => {
@@ -291,8 +288,6 @@ const Release = () => {
         rowColor.current = json.data.code;
 
         setMasterCode(json.data.code);
-        console.log('===== json.data.releaseDetails =====');
-        console.log(json.data.releaseDetails);
         setreleaseDetail(json.data.releaseDetails);
         setreleaseMaster((DetailList) => [
           {
@@ -356,9 +351,9 @@ const Release = () => {
       if (json.result !== 'success') {
         throw new Error(`${json.result} ${json.message}`);
       }
-      setOpenDeleteModalInMaster(false); // 삭제 완료 후 모달창 제거
       setreleaseDetail([{}]); // detail 리스트도 clear
-      releaseMasterSearch('load'); // master 리스트 update
+      setCheckedRow(checkedRow.filter((row) => row.state !== 't'));
+      releaseMasterSearch('search'); // master 리스트 update
     } catch (err) {
       console.log(err);
     }
@@ -388,9 +383,8 @@ const Release = () => {
         throw new Error(`${json.result} ${json.message}`);
       }
 
-      setOpenDeleteModalInDetail(false); // 모달창 제거
       detail.no.length === detail.length
-        ? (setreleaseDetail([{}]), releaseMasterSearch(null))
+        ? (setreleaseDetail([{}]), releaseMasterSearch('search'))
         : (setCheckedRow(updatedCheckedRow(detail)), setreleaseDetail(releaseDetail.filter((d) => !detail.no.includes(d.no))));
     } catch (err) {
       console.log(err);
@@ -423,6 +417,39 @@ const Release = () => {
       return row;
     });
 
+    const modalMessage = () => {  // masterStateT를 사용하지 않은 이유 - delete 작업 후에 우리가 checkedRow만 update 해줘서
+      const length = checkedRow.filter((row) => row.state === 't').length;
+
+      if (releaseMaster.length === length) {
+        return '출고 기록 전체를 삭제하시겠습니까?';
+      }
+      if (length === 0) {
+        return 0;
+      }
+      if (length === 1) {
+        console.log(masterStateT);
+        return masterStateT[0] + '을 삭제하시겠습니까?';
+      }
+      return length + '개의 출고 정보를 삭제하시겠습니까?';
+    };
+
+    const modalDetailMessage = () => {
+      const length = deleteObj.no.length;
+      // if (submitError.current != '') {
+      //   return submitError.current;
+      // }
+      if (releaseDetail.length === length) {
+        return deleteObj.masterCode + '의 기록 전체를 삭제하시겠습니까?';
+      }
+      if (length === 0) {
+        return 0;
+      }
+      if (length === 1) {
+        return deleteObj.no[0] + '을 삭제하시겠습니까?';
+      }
+      return length + '개의 정보를 삭제하시겠습니까?';
+    };
+
   return (
     <Box>
       <ManagerModal open={openManager} onClose={() => setOpenManager(false)} handleButtonClick={handleButtonClick} />
@@ -432,6 +459,7 @@ const Release = () => {
         onClose={() => setOpenReleaseInsert(false)}
         handleButtonClick={handleButtonClick}
         details={releaseDetail}
+        setreleaseDetail={setreleaseDetail}
         releaseAdd={releaseAdd}
       />
       <DeleteMasterModal
@@ -467,6 +495,8 @@ const Release = () => {
           masterStateT={masterStateT}
           loading={loading}
           releaseMasterSearch={releaseMasterSearch}
+          modalMessage={modalMessage}
+          deleteMasterHandler={deleteMasterHandler}
         />
         <ReleaseDetail
           details={releaseDetail}
@@ -479,6 +509,9 @@ const Release = () => {
           openDeleteModalInDetail={openDeleteModalInDetail}
           openReleaseInsert={openReleaseInsert}
           detailInput={detailInput}
+          deleteDetailHandler={deleteDetailHandler}
+          deleteObj={deleteObj}
+          modalDetailMessage={modalDetailMessage}
         />
       </Grid>
     </Box>

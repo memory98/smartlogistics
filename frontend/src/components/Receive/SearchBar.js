@@ -1,19 +1,19 @@
-import { Button, FormControl, TextField, Box, Grid } from '@mui/material';
-import React, { useState, useEffect, useRef } from 'react';
-import SearchIcon from '@mui/icons-material/Search';
+import { Button, FormControl, TextField, Box, Grid } from "@mui/material";
+import React, { useState, useEffect, useRef } from "react";
+import SearchIcon from "@mui/icons-material/Search";
 
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 const SerchBar = ({ callback, searchKw }) => {
   const [searchTextFiled, setSearchTextFiled] = useState({
-    rcode: '',
-    bname: '',
-    startdt: '',
-    enddt: '',
+    rcode: "",
+    bname: "",
+    startdt: "",
+    enddt: "",
   });
 
   const refForm = useRef(null);
@@ -35,8 +35,8 @@ const SerchBar = ({ callback, searchKw }) => {
     //    setLoading(true);
     // setScrollend(false);
     searchKw.current = searchTextFiled;
-    callback('search');
-    setSearchTextFiled({ ...searchTextFiled, rcode: '', bname: '' });
+    callback("search");
+    setSearchTextFiled({ ...searchTextFiled, rcode: "", bname: "" });
   };
 
   // useEffect(() => {
@@ -49,30 +49,30 @@ const SerchBar = ({ callback, searchKw }) => {
       xs={12}
       md={12}
       sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
         marginBottom: 3,
-        backgroundColor: '#FFF',
-        borderRadius: '8px',
-        boxShadow: '5px 5px 5px rgba(0, 0, 0, 0.1)',
-        height: '100px',
+        backgroundColor: "#FFF",
+        borderRadius: "8px",
+        boxShadow: "5px 5px 5px rgba(0, 0, 0, 0.1)",
+        height: "100px",
       }}
     >
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          marginLeft: '30px',
-          marginTop: '6px',
-          marginBottom: '10px',
+          display: "flex",
+          alignItems: "center",
+          marginLeft: "30px",
+          marginTop: "6px",
+          marginBottom: "10px",
         }}
       >
         <span
           style={{
-            fontSize: '23px',
+            fontSize: "23px",
             fontWeight: 800,
-            marginRight: '15px',
+            marginRight: "15px",
           }}
         >
           입고
@@ -80,15 +80,15 @@ const SerchBar = ({ callback, searchKw }) => {
 
         <span
           style={{
-            backgroundColor: '#EBF2FF',
-            padding: '2px 5px 4.5px 0',
+            backgroundColor: "#EBF2FF",
+            padding: "2px 5px 4.5px 0",
           }}
         >
           <span
             style={{
-              color: 'gray',
-              fontSize: '9px',
-              marginLeft: '8px',
+              color: "gray",
+              fontSize: "9px",
+              marginLeft: "8px",
             }}
           >
             입고를 조회할 수 있습니다.
@@ -103,20 +103,20 @@ const SerchBar = ({ callback, searchKw }) => {
           submit(e);
         }}
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          marginBottom: '5px',
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          marginBottom: "5px",
         }}
       >
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
           }}
         >
-          <label style={{ fontSize: '0.9rem' }}>입고코드</label>
+          <label style={{ fontSize: "0.9rem" }}>입고코드</label>
           <TextField
             type="text"
             name="rcode"
@@ -126,7 +126,7 @@ const SerchBar = ({ callback, searchKw }) => {
             InputProps={{ sx: { height: 30, width: 150 } }}
             value={searchTextFiled.rcode}
           />
-          <label style={{ fontSize: '0.9rem' }}>거래처</label>
+          <label style={{ fontSize: "0.9rem" }}>거래처</label>
           <TextField
             type="text"
             name="bname"
@@ -136,77 +136,81 @@ const SerchBar = ({ callback, searchKw }) => {
             InputProps={{ sx: { height: 30, width: 150 } }}
             value={searchTextFiled.bname}
           />
-          <label style={{ fontSize: '0.9rem' }}>기간</label>
-          <LocalizationProvider dateAdapter={AdapterDayjs} sx={{ height: '60px' }}>
+          <label style={{ fontSize: "0.9rem" }}>기간</label>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            sx={{ height: "60px" }}
+          >
             <DemoContainer
-              components={['DatePicker']}
+              components={["DatePicker"]}
               sx={{
                 p: 0,
                 minWidth: 0,
-                '& .css-1xhypcz-MuiStack-root': {
+                "& .MuiStack-root": {
                   padding: 0,
                 },
               }}
             >
               <DatePicker
+                maxDate={searchTextFiled.enddt || dayjs().subtract(-6, "day")}
                 format="YYYY-MM-DD"
                 slotProps={{
-                  textField: { size: 'small', style: { minWidth: 'unset' } },
+                  textField: { size: "small", style: { minWidth: "unset" } },
                 }}
                 sx={{
                   minWidth: 0,
                   paddingLeft: 2,
-                  overflow: 'hidden',
-                  '& .css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input': {
-                    padding: 0,
-                    height: '1em',
-                    width: 105,
-                    marginLeft: '10px',
-                  },
-                  '& .css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root': {
-                    width: '165px',
-                  },
-                  '& .css-e1omjc-MuiStack-root>.MuiTextField-root': {
-                    minWidth: 0,
-                    height: '35px',
-                  },
+                  overflow: "hidden",
+                  "& .MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputSizeSmall.MuiInputBase-inputAdornedEnd":
+                    {
+                      padding: 0,
+                      height: "1em",
+                      width: 105,
+                      marginLeft: "10px",
+                    },
+                  "& .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-sizeSmall.MuiInputBase-adornedEnd":
+                    {
+                      width: "165px",
+                      height: "30px",
+                    },
                 }}
                 onAccept={handleAcceptStart}
-                value={searchTextFiled.startdt === '' ? dayjs().subtract(6, 'day') : dayjs(searchTextFiled.startdt)}
+                value={
+                  searchTextFiled.startdt === ""
+                    ? dayjs().subtract(6, "day")
+                    : dayjs(searchTextFiled.startdt)
+                }
               ></DatePicker>
-              <span>~</span>
+              <span style={{ alignSelf: "center" }}>~</span>
               <DatePicker
-                style={{
-                  '& .css-3tvb69-MuiStack-root>.MuiTextField-root': {
-                    minWidth: 0,
-                    backgroundColor: '#333',
-                  },
-                }}
                 format="YYYY-MM-DD"
                 slotProps={{
-                  textField: { size: 'small' },
+                  textField: { size: "small" },
                 }}
                 sx={{
                   minWidth: 0,
                   paddingRight: 5,
                   overflow: 'hidden',
-                  '& .css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input': {
-                    padding: 0,
-                    height: '1em',
-                    width: 105,
-                    marginLeft: '10px',
-                  },
-                  '& .css-o9k5xi-MuiInputBase-root-MuiOutlinedInput-root': {
-                    width: '165px',
-                  },
-                  '& .css-e1omjc-MuiStack-root>.MuiTextField-root': {
-                    minWidth: 0,
-                    height: '35px',
-                  },
+                  "& .MuiInputBase-input.MuiOutlinedInput-input.MuiInputBase-inputSizeSmall.MuiInputBase-inputAdornedEnd":
+                    {
+                      padding: 0,
+                      height: "1em",
+                      width: 105,
+                      marginLeft: "10px",
+                    },
+                  "& .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-sizeSmall.MuiInputBase-adornedEnd":
+                    {
+                      width: "165px",
+                      height: "30px",
+                    },
                 }}
-                minDate={searchTextFiled.startdt || dayjs().subtract(6, 'day')}
+                minDate={searchTextFiled.startdt || dayjs().subtract(6, "day")}
                 onAccept={handleAcceptEnd}
-                value={searchTextFiled.enddt === '' ? dayjs().add(6, 'day') : dayjs(searchTextFiled.enddt)}
+                value={
+                  searchTextFiled.enddt === ""
+                    ? dayjs().add(6, "day")
+                    : dayjs(searchTextFiled.enddt)
+                }
               ></DatePicker>
             </DemoContainer>
           </LocalizationProvider>

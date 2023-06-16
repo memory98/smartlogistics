@@ -19,6 +19,7 @@ import UserItem from "./Useritem";
 import AddIcon from "@mui/icons-material/Add";
 import RegisterModal from "./Register";
 import SelectedDataDeleteModal from "../Modal/SelectedDataDeleteModal";
+import Swal from "sweetalert2";
 
 /** 테이블 Header 고정을 위한 styled component 사용 */
 // top의 px값은 첫 행의 높이와 같게
@@ -93,7 +94,7 @@ const UserList = ({
       return "유저 전체를 삭제하시겠습니까?";
     }
     if (length === 0) {
-      return "선택한 데이터가 없습니다.";
+      return 0;
     }
     if (length === 1) {
       return checkedButtons[0] + "을 삭제하시겠습니까?";
@@ -191,7 +192,33 @@ const UserList = ({
           />
           <DeleteIcon
             sx={{ padding: "7px", cursor: "pointer", marginLeft: "auto" }}
-            onClick={handleOpen}
+            onClick={() => {
+              const message = modalMessage();
+              message === 0
+                ? Swal.fire("", "체크된 데이터가 존재하지 않습니다.", "warning")
+                : Swal.fire({
+                    text: modalMessage(), // modalMessage()
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "삭제",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      const returnData = onDeleteButton();
+
+                      returnData.then((result) => {
+                        if (result === "") {
+                          Swal.fire(
+                            "Deleted!",
+                            "삭제가 완료되었습니다",
+                            "success"
+                          );
+                        }
+                      });
+                    }
+                  });
+            }}
           />
         </Box>
 

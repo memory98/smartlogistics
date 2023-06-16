@@ -225,13 +225,12 @@ const Modal4ReceiveMaster = ({
                           rowColor={rowColor}
                           state={master.state}
                           details={details}
-
                         />
                       ))
                     ) : (
                       <TableRow>
                         <TableCell colSpan={7} sx={{ textAlign: "center" }}>
-                          등록된 품목이 없습니다.
+                          등록된 입고가 없습니다.
                         </TableCell>
                       </TableRow>
                     )}

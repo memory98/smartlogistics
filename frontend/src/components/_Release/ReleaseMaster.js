@@ -13,17 +13,18 @@ import {
   TableHead,
   TableRow,
   TextField,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import styled from 'styled-components';
-import React, { useState, useEffect } from 'react';
-import MasterItem from './MasterItem';
-import checkImg from '../../assets/img/checkmark.png';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import SearchIcon from '@mui/icons-material/Search';
-import { format } from 'date-fns';
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+import MasterItem from "./MasterItem";
+import checkImg from "../../assets/img/checkmark.png";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import SearchIcon from "@mui/icons-material/Search";
+import { format } from "date-fns";
+import Swal from "sweetalert2";
 
 /** 테이블 Header 고정을 위한 styled component 사용 */
 // top의 px값은 첫 행의 높이와 같게
@@ -49,7 +50,9 @@ const ReceiveMaster = ({
   setInputMaster,
   masterStateT,
   loading,
-  releaseMasterSearch
+  releaseMasterSearch,
+  modalMessage,
+  deleteMasterHandler,
 }) => {
   useEffect(() => {
     nullChkHandler(inputMaster);
@@ -63,7 +66,7 @@ const ReceiveMaster = ({
   };
 
   const handleAccept = (date) => {
-    setInputMaster({ ...inputMaster, date: format(date.$d, 'yyyy-MM-dd') });
+    setInputMaster({ ...inputMaster, date: format(date.$d, "yyyy-MM-dd") });
   };
 
   /** 모두 선택해주는 체크박스 (All Master) */
@@ -71,7 +74,7 @@ const ReceiveMaster = ({
     const updatedCheckedRow = checkedRow.map((row) => {
       return {
         ...row,
-        state: checked ? 't' : 'f',
+        state: checked ? "t" : "f",
       };
     });
     setCheckedRow(updatedCheckedRow);
@@ -82,8 +85,10 @@ const ReceiveMaster = ({
     setCheckedRow(
       checkedRow.map((row) => {
         if (row.master === code) {
-          const newState = checked ? 't' : 'f';
-          const newDetail = checked ? row.detail : row.detail.map((d) => ({ ...d, state: 'f' }));
+          const newState = checked ? "t" : "f";
+          const newDetail = checked
+            ? row.detail
+            : row.detail.map((d) => ({ ...d, state: "f" }));
           return {
             ...row,
             state: newState,
@@ -100,15 +105,15 @@ const ReceiveMaster = ({
     const { scrollTop, clientHeight, scrollHeight } = event.target;
 
     if (clientHeight + scrollTop + 10 > scrollHeight) {
-      releaseMasterSearch('load');
+      releaseMasterSearch("load");
     }
   };
 
   useEffect(() => {
-    const tablePro = document.getElementById('table');
-    tablePro.addEventListener('scroll', handleWindowScroll);
+    const tablePro = document.getElementById("table");
+    tablePro.addEventListener("scroll", handleWindowScroll);
     return () => {
-      tablePro.removeEventListener('scroll', handleWindowScroll);
+      tablePro.removeEventListener("scroll", handleWindowScroll);
     };
   }, []);
   return (
@@ -116,61 +121,75 @@ const ReceiveMaster = ({
       item
       xs={12}
       sx={{
-        width: '100%',
+        width: "100%",
         height: 360,
-        backgroundColor: '#FFF',
-        borderRadius: '8px',
+        backgroundColor: "#FFF",
+        borderRadius: "8px",
         marginBottom: 1.8,
-        boxShadow: '5px 5px 5px rgba(0, 0, 0, 0.1)',
+        boxShadow: "5px 5px 5px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Box sx={{ display: 'flex', paddingLeft: 3, width: '94%' }}>
+      <Box sx={{ display: "flex", paddingLeft: 3, width: "94%" }}>
         <Box
           component="img"
           src={checkImg}
           sx={{
-            width: '30px',
-            height: '30px',
+            width: "30px",
+            height: "30px",
           }}
         />
         <span
           style={{
-            position: 'relative',
-            fontSize: '16px',
+            position: "relative",
+            fontSize: "16px",
             fontWeight: 800,
-            marginRight: '15px',
-            marginTop: '5px',
-            marginLeft: '10px',
+            marginRight: "15px",
+            marginTop: "5px",
+            marginLeft: "10px",
           }}
         >
           출고리스트
         </span>
         <DeleteIcon
           sx={{
-            padding: '7px',
-            cursor: 'pointer',
-            marginLeft: 'auto',
+            padding: "7px",
+            cursor: "pointer",
+            marginLeft: "auto",
           }}
           onClick={() => {
-            masterStateT.length !== 0 ? toggleModal(openDeleteModalInMaster, 'deleteMaster') : toggleModal(openNullModal, 'null');
+            modalMessage() === 0
+              ? Swal.fire("", "체크된 데이터가 존재하지 않습니다.", "warning")
+              : Swal.fire({
+                  text: modalMessage(), // modalMessage()
+                  icon: "question",
+                  showCancelButton: true,
+                  confirmButtonColor: "#3085d6",
+                  cancelButtonColor: "#d33",
+                  confirmButtonText: "삭제",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    deleteMasterHandler(masterStateT); // 삭제 api
+                    Swal.fire("Deleted!", "삭제가 완료되었습니다", "success");
+                  }
+                });
           }}
         />
       </Box>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
         }}
       >
         <FormControl component="form" id="table">
           <TableContainer
             component={Paper}
             sx={{
-              width: '94%',
+              width: "94%",
               paddingLeft: 3,
               paddingTop: 0,
-              boxShadow: 'none',
+              boxShadow: "none",
               height: 300,
             }}
             onScroll={handleWindowScroll}
@@ -180,10 +199,10 @@ const ReceiveMaster = ({
                 <TableRow sx={{ height: 3 }}>
                   <TableCell
                     sx={{
-                      width: '5%',
-                      backgroundColor: '#F6F7F9',
+                      width: "5%",
+                      backgroundColor: "#F6F7F9",
                       p: 0,
-                      textAlign: 'center',
+                      textAlign: "center",
                     }}
                   >
                     <Checkbox
@@ -191,50 +210,76 @@ const ReceiveMaster = ({
                       onChange={(e) => {
                         masterAllCheckBox(e.currentTarget.checked);
                       }}
-                      checked={checkedRow.length !== 0 && checkedRow.every((row) => row.state === 't')}
+                      checked={
+                        checkedRow.length !== 0 &&
+                        checkedRow.every((row) => row.state === "t")
+                      }
                     />
                   </TableCell>
-                  <TableCell sx={{ width: '18%', backgroundColor: '#F6F7F9', fontWeight: '800' }}>출고번호</TableCell>
-                  <TableCell sx={{ backgroundColor: '#F6F7F9', fontWeight: '800' }}>출고일</TableCell>
-                  <TableCell sx={{ backgroundColor: '#F6F7F9', fontWeight: '800' }}>담당자</TableCell>
-                  <TableCell sx={{ backgroundColor: '#F6F7F9', fontWeight: '800' }}>거래처</TableCell>
-                  <TableCell sx={{ width: '10%', backgroundColor: '#F6F7F9', fontWeight: '800' }}>진행상태</TableCell>
-                  <TableCell sx={{ width: '10%', backgroundColor: '#F6F7F9', p: 0, fontWeight: '800' }}>비고</TableCell>
+                  <TableCell
+                    sx={{
+                      width: "18%",
+                      backgroundColor: "#F6F7F9",
+                      fontWeight: "800",
+                    }}
+                  >
+                    출고번호
+                  </TableCell>
+                  <TableCell
+                    sx={{ backgroundColor: "#F6F7F9", fontWeight: "800" }}
+                  >
+                    출고일
+                  </TableCell>
+                  <TableCell
+                    sx={{ backgroundColor: "#F6F7F9", fontWeight: "800" }}
+                  >
+                    담당자
+                  </TableCell>
+                  <TableCell
+                    sx={{ backgroundColor: "#F6F7F9", fontWeight: "800" }}
+                  >
+                    거래처
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "10%",
+                      backgroundColor: "#F6F7F9",
+                      fontWeight: "800",
+                    }}
+                  >
+                    진행상태
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      width: "15%",
+                      backgroundColor: "#F6F7F9",
+                      p: 0,
+                      fontWeight: "800",
+                      textAlign: "center",
+                    }}
+                  >
+                    비고
+                  </TableCell>
                 </TableRow>
                 <TableRow sx={{ height: 2, p: 0 }}>
                   <TableStickyTypeCell></TableStickyTypeCell>
                   <TableStickyTypeCell></TableStickyTypeCell>
                   <TableStickyTypeCell sx={{ p: 0 }}>
-                    <LocalizationProvider
-                      dateAdapter={AdapterDayjs}
-                      sx={{
-                        height: '60px',
-                      }}
-                    >
-                      <DemoContainer
-                        components={['DatePicker']}
-                        sx={{
-                          p: 0,
-                          '& .css-1xhypcz-MuiStack-root': {
-                            padding: 0,
-                          },
-                        }}
-                      >
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["DatePicker"]}>
                         <DatePicker
                           format="YYYY-MM-DD"
                           slotProps={{
-                            textField: { size: 'small' },
+                            textField: { size: "small" },
                           }}
                           sx={{
                             paddingLeft: 2,
                             paddingRight: 5,
-                            height: '35px',
-                            '& .css-19qh8xo-MuiInputBase-input-MuiOutlinedInput-input': {
-                              padding: 0,
-                              height: '1em',
-                              width: 150,
-                              marginLeft: '10px',
-                            },
+                            height: "34px",
+                            "& .MuiInputBase-root.MuiOutlinedInput-root.MuiInputBase-colorPrimary.MuiInputBase-formControl.MuiInputBase-sizeSmall.MuiInputBase-adornedEnd":
+                              {
+                                height: "27px",
+                              },
                           }}
                           value={inputMaster.date || null}
                           onAccept={handleAccept}
@@ -247,37 +292,41 @@ const ReceiveMaster = ({
                     <Box
                       sx={{
                         p: 0,
-                        border: '1px solid #C4C4C4',
-                        height: '28px',
-                        display: 'flex',
-                        width: '190px',
-                        marginRight: '5px',
-                        borderRadius: '4px',
-                        paddingRight: '8px',
+                        border: "1px solid #C4C4C4",
+                        height: "28px",
+                        display: "flex",
+                        width: "190px",
+                        marginRight: "5px",
+                        borderRadius: "4px",
+                        paddingRight: "8px",
                       }}
                     >
                       <input
                         readOnly
                         type="text"
                         style={{
-                          marginLeft: '10px',
-                          width: '140px',
-                          height: '27px',
+                          marginLeft: "10px",
+                          width: "140px",
+                          height: "27px",
                           border: 0,
-                          cursor: 'pointer',
+                          cursor: "pointer",
                         }}
                         name="userName"
                         placeholder="담당자명"
                         value={inputMaster.userName}
                         onChange={onChangeHandler}
                         onClick={() => {
-                          toggleModal(openManager, 'manager');
+                          toggleModal(openManager, "manager");
                         }}
                       />
                       <SearchIcon
-                        sx={{ marginLeft: 'auto', marginTop: '3px', cursor: 'pointer' }}
+                        sx={{
+                          marginLeft: "auto",
+                          marginTop: "3px",
+                          cursor: "pointer",
+                        }}
                         onClick={() => {
-                          toggleModal(openManager, 'manager');
+                          toggleModal(openManager, "manager");
                         }}
                       />
                     </Box>
@@ -286,36 +335,40 @@ const ReceiveMaster = ({
                     <Box
                       sx={{
                         p: 0,
-                        border: '1px solid #C4C4C4',
-                        height: '28px',
-                        display: 'flex',
-                        width: '190px',
-                        marginRight: '5px',
-                        borderRadius: '4px',
-                        paddingRight: '8px',
+                        border: "1px solid #C4C4C4",
+                        height: "28px",
+                        display: "flex",
+                        width: "190px",
+                        marginRight: "5px",
+                        borderRadius: "4px",
+                        paddingRight: "8px",
                       }}
                     >
                       <input
                         type="text"
                         style={{
-                          marginLeft: '10px',
-                          width: '140px',
-                          height: '27px',
+                          marginLeft: "10px",
+                          width: "140px",
+                          height: "27px",
                           border: 0,
-                          cursor: 'pointer',
+                          cursor: "pointer",
                         }}
                         name="businessName"
                         placeholder="거래처명"
                         value={inputMaster.businessName}
                         onChange={onChangeHandler}
                         onClick={() => {
-                          toggleModal(openBusiness, 'business');
+                          toggleModal(openBusiness, "business");
                         }}
                       />
                       <SearchIcon
-                        sx={{ marginLeft: 'auto', marginTop: '3px', cursor: 'pointer' }}
+                        sx={{
+                          marginLeft: "auto",
+                          marginTop: "3px",
+                          cursor: "pointer",
+                        }}
                         onClick={() => {
-                          toggleModal(openBusiness, 'business');
+                          toggleModal(openBusiness, "business");
                         }}
                       />
                     </Box>
@@ -326,7 +379,14 @@ const ReceiveMaster = ({
               </TableHead>
               <TableBody>
                 {loading.current ? (
-                  <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
                     <CircularProgress />
                   </Box>
                 ) : masters.length > 0 ? (
@@ -346,7 +406,7 @@ const ReceiveMaster = ({
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} sx={{ textAlign: 'center' }}>
+                    <TableCell colSpan={7} sx={{ textAlign: "center" }}>
                       등록된 품목이 없습니다.
                     </TableCell>
                   </TableRow>

@@ -103,7 +103,7 @@ public class ReceiveController {
 			startDate = DateUtil.minusDays(6);
 			endDate = DateUtil.addDays(6);
 		}
-		System.out.println(receiveCode+"///////"+businessName+"//////"+startDate+"///"+endDate);
+		System.out.println("lsit111111111111111111"+receiveCode+"///////"+businessName+"//////"+startDate+"///"+endDate);
 		for(ReceiveMasterVo vo:receiveService.modalfindByKeyword(receiveCode, businessName, startDate, endDate, offset, limit)) {
 			System.out.println(vo);
 		}
@@ -147,7 +147,7 @@ public class ReceiveController {
 			@RequestParam(value = "u", required = true, defaultValue = "") String userName) {
 		System.out.println("--------------------------" + userName);
 		return ResponseEntity.status(HttpStatus.OK).body(JsonResult.success(receiveService.findByName(userName)));
-	}
+	}	
 
 	// my release master statistics
 	@GetMapping("/mystatistics")

@@ -55,7 +55,7 @@ public class SecurityConfig {
                     /** HttpServletRequest를 사용하는 요청들에 대한 접근 제한 설정*/
                     .and()
                     .authorizeRequests()
-                    .antMatchers("/api/sign/login","/","/api/sign/refresh", "/imgages/**", "/assets/**").permitAll()
+                    .antMatchers("/api/sign/login","/","/api/sign/refresh","/receive", "/release", "/product", "/business", "/mypage", "/inquiry", "/imgages/**", "/assets/**").permitAll()
                     //모두 인증이 있어야 실행된다는 의미
                     .anyRequest().authenticated()
 

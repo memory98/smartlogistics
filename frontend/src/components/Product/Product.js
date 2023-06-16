@@ -4,6 +4,7 @@ import SearchBar from './SearchBar';
 import ProductUpdate from './ProductUpdate';
 import { Box, Grid } from '@mui/material';
 import { customFetch } from '../custom/customFetch';
+import Swal from 'sweetalert2';
 
 const Product = () => {
   // productlist
@@ -73,7 +74,7 @@ const Product = () => {
         if (json.data.state === 'true') {
           setProducts((prev) => [...prev, json.data.vo]);
           setCodeChk(true);
-          alert('등록되었습니다.');
+          Swal.fire('', '품목이 추가되었습니다.', 'success');
           setSearchEvent((prev) => !prev);
           setDetail([]);
           rowColor.current = '';
@@ -81,9 +82,9 @@ const Product = () => {
           setCodeChk(false);
 
           if (json.data.vo.state === '1') {
-            alert('이미 등록되어 있는 데이터 입니다');
+            Swal.fire('', '이미 등록되어 있는 데이터 입니다.', 'warning');
           } else if (json.data.vo.state === '0') {
-            alert('삭제된 데이터 품번과 동일합니다.');
+            Swal.fire('', '삭제된 데이터 품번과 동일합니다.', 'warning');
           }
           //if(json.data.vo.state)
         }
@@ -99,6 +100,7 @@ const Product = () => {
       body: JSON.stringify(item),
     }).then(() => productSearch('search'));
     setSearchEvent((prev) => !prev);
+    Swal.fire('', target + '의 정보 수정이 완료되었습니다.', 'success');
   };
 
   // product 세부사항

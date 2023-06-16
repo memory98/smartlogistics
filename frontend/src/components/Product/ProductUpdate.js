@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { border } from '@mui/system';
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 
 export default function ProductUpdate({ itemUpdateHandler, productDetail, item, setItem }) {
   const [target, setTarget] = useState();
@@ -38,6 +39,7 @@ export default function ProductUpdate({ itemUpdateHandler, productDetail, item, 
     e.preventDefault();
     // if(Object.values(item).some(value => value === '')) {
     //   alert("빈 값이 존재합니다!");
+    //   Swal.fire('', '빈 값이 존재합니다. ', 'warning');
     //   setItem({
     //     code: productDetail.code,
     //     name: productDetail.name,
@@ -46,14 +48,14 @@ export default function ProductUpdate({ itemUpdateHandler, productDetail, item, 
     //   });
     // }
     if(item.name === "" || item.name.length > 20) {
-      alert("품명 필수 값이며 최대 20자입니다.");
+      Swal.fire('', '품명 필수 값이며 최대 20자입니다.', 'warning');
       setItem({
         ...item,
         name: productDetail.name,
       });
     }
     else if(item.size === "" || item.unit === "") {
-      alert("규격 또는 단위가 빈 값입니다!");
+      Swal.fire('', '규격 또는 단위가 빈 값입니다', 'warning');
       setItem({
         ...item,
         size: productDetail.size,
@@ -61,7 +63,6 @@ export default function ProductUpdate({ itemUpdateHandler, productDetail, item, 
       });
     }
     else {  // 빈 값이 없으면 === 모두 채워져있으면: (Object.values(item).every(value => value !== ''))
-      alert("수정이 완료되었습니다!");
       itemUpdateHandler(item, target);
     }
     

@@ -27,7 +27,7 @@ const Logo = () => {
                     
                     fontWeight: 800,
                     pt: '5px',
-                }}>LOGISTRICS</Typography>
+                }}>LOGISTICS</Typography>
 
         </Box>
     );

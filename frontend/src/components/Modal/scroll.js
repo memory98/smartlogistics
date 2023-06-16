@@ -13,11 +13,6 @@ import {
   List,
   AutoSizer,
 } from "react-virtualized";
-import Table from "../Table/Table";
-import TableBody from "../Table/TableBody";
-import TableCell from "../Table/TableCell";
-import TableRow from "../Table/TableRow";
-import TableHead from "../Table/TableHead";
 
 export default function Modal3({ open, onClose }) {
   const [person, setPerson] = useState([]);

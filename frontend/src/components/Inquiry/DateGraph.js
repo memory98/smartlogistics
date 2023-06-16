@@ -46,7 +46,7 @@ const DateGraph = ({ inquiry, page }) => {
     return `${year}-${month}-${day}`;
   }
 
-  const [startdate, setStartDate] = useState(settingStartdate('day', -7));
+  const [startdate, setStartDate] = useState(settingStartdate('day', -6));
 
   // DatePicker의 값을 저장하는 메소드
   const settingdate = (date,value) => {
@@ -128,21 +128,21 @@ const DateGraph = ({ inquiry, page }) => {
     console.log(dateArray);
 
     setGraph('day');
-    setStartDate(settingStartdate('day', -7));
+    setStartDate(settingStartdate('day', -6));
   }
 
   //click 시 달 기준으로 12달의 그래프를 보여주는 메소드
   const handleClickMonth = (e) => {
     console.log("month 실행!")
     setGraph('month');
-    setStartDate(settingStartdate('month', -12));
+    setStartDate(settingStartdate('month', -11));
   }
 
   //click 시 년 기준으로 5년의 그래프를 보여주는 메소드
   const handleClickYear = (e) => {
     console.log("year 실행!")
     setGraph('year');
-    setStartDate(settingStartdate('year', -5));
+    setStartDate(settingStartdate('year', -4));
   }
 
   // 그래프의 바를 클릭 시 Doughnut의 그래프가 보여지는 메소드
@@ -173,13 +173,13 @@ const DateGraph = ({ inquiry, page }) => {
 
   const handleChangeDate = (date) => {
     if(graph==='day') {
-      setStartDate(settingdate(date, -7));
+      setStartDate(settingdate(date, -6));
     }
     if(graph==='month') {
-      setStartDate(settingdate(date, -12));
+      setStartDate(settingdate(date, -11));
     }
     if(graph==='year') {
-      setStartDate(settingdate(date, -5));
+      setStartDate(settingdate(date, -4));
     }
     setSelectedBar([sum(IScountArray), sum(RVcountArray)]);
   };

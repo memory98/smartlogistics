@@ -32,13 +32,6 @@ const AdminRoute = ({ role, info, setUserInfo }) => {
         <Routes>
           {role === "admin" ? (
             <>
-              <Route
-                path="/mypage"
-                element={layout(
-                  <MyPage info={info} setUserInfo={setUserInfo} />,
-                  "/mypage"
-                )}
-              />
               <Route path="/" element={layout(<User />, "/register2")} />
             </>
           ) : role === "user" ? (

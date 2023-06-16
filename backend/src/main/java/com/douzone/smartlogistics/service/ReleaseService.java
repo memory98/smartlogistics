@@ -44,9 +44,11 @@ public class ReleaseService {
 		boolean isUpdateReleaseCount = releaseRepository.updateReleaseCountInReceive(detailNo);
 		boolean isDeleteDetailSuccess = releaseRepository.deleteDetailItem(detailNo);
 		boolean isDeleteStockDetailNo = releaseRepository.deleteStockByDetailNo(masterCode, detailNo);
-		
+		System.out.println("\n\n" + "사이즈 ㅎ과인");
+		System.out.println(detailNo.size() + " : " + length);
+		System.out.println(isUpdateReleaseCount + " : " + isDeleteDetailSuccess + " : " + isDeleteStockDetailNo);
 		return (detailNo.size() == length) ? (
-				isUpdateReleaseCount && isDeleteDetailSuccess && isDeleteStockDetailNo && releaseRepository.deleteMasterByDetailNo(masterCode)) 
+				 isUpdateReleaseCount && isDeleteDetailSuccess && isDeleteStockDetailNo && releaseRepository.deleteMasterByDetailNo(masterCode))  
 				: isUpdateReleaseCount && isDeleteDetailSuccess && isDeleteStockDetailNo;
 	}
 

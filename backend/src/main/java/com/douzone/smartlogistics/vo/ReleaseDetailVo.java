@@ -17,6 +17,7 @@ public class ReleaseDetailVo {
     private String receiveCode;
     private String receiveDetailNo;
     private int count;
+    private int stockCnt;
     
     private DBLogVo log;
 }

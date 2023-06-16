@@ -100,17 +100,17 @@ FETCH NEXT #{limit} ROWS ONLY
 						<choose>
 							<when test='"year".equals(state)'>
 								<![CDATA[
-									5
+									4
 								]]>
 							</when>
 							<when test='"month".equals(state)'>
 								<![CDATA[
-									12
+									11
 								]]>
 							</when>
 							<otherwise>
 								<![CDATA[
-									7
+									6
 								]]>
 							</otherwise>
 						</choose>
@@ -209,29 +209,29 @@ FETCH NEXT #{limit} ROWS ONLY
 						<choose>
 							<when test='"year".equals(state)'>
 								<![CDATA[
-									5
+									4
 								]]>
 							</when>
 							<when test='"month".equals(state)'>
 								<![CDATA[
-									12
+									11
 								]]>
 							</when>
 							<otherwise>
 								<![CDATA[
-									7
+									6
 								]]>
 							</otherwise>
 						</choose>
 							<![CDATA[) D
 		   ) A
-	 LEFT JOIN ( SELECT state, date, F.count
+	 LEFT JOIN ( SELECT state, _date AS date, F.count
 	   FROM (
 			SELECT 'IS' AS state, CONCAT( ]]>
 								<choose>
 							<when test='"year".equals(state)'>
 								<![CDATA[
-									EXTRACT(YEAR FROM date)) AS date
+									EXTRACT(YEAR FROM date)) AS _date
 	                               ]]>
 							</when>
 							<when test='"month".equals(state)'>
@@ -241,21 +241,21 @@ FETCH NEXT #{limit} ROWS ONLY
 	                                CASE 
 										WHEN EXTRACT(MONTH FROM date) < '10' 
 										THEN CONCAT('0',EXTRACT(MONTH FROM date))
-	                                ELSE EXTRACT(MONTH FROM date) END) AS date
+	                                ELSE EXTRACT(MONTH FROM date) END) AS _date
 	                               ]]>
 							</when>
 							<otherwise>
 								<![CDATA[
-									date) AS date
+									date) AS _date
 	                               ]]>
 							</otherwise>
 						</choose>
 							<![CDATA[
 								, COUNT(date) AS count
 			  FROM release_master
-		  GROUP BY date
+		  GROUP BY _date
 	   ) F	
-	   GROUP BY F.date
+	   GROUP BY F._date
 	   ) E
 			ON A.date = E.date
 	  ORDER BY A.date

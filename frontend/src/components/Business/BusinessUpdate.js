@@ -13,6 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import Swal from 'sweetalert2';
 
 function BusinessUpdate({ itemUpdateHandler, businessDetail, item, setItem }) {
   const refForm = useRef(null);
@@ -46,7 +47,7 @@ function BusinessUpdate({ itemUpdateHandler, businessDetail, item, setItem }) {
     e.preventDefault();
     console.log(item, target);
     if (item.name === "") {
-      alert("거래처명을 공백으로 할 수 없습니다.");
+      Swal.fire('', '거래처명은 필수 값입니다.', 'warning');
       setItem({
         code: businessDetail.code,
         name: businessDetail.name,
@@ -55,7 +56,7 @@ function BusinessUpdate({ itemUpdateHandler, businessDetail, item, setItem }) {
       return;
     }
     if (item.phone.length < 13) {
-      alert("핸드폰 번호를 모두 적어주세요.");
+      Swal.fire('', '핸드폰 번호를 모두 적어주세요.', 'warning');
       setItem({
         code: businessDetail.code,
         name: item.name,

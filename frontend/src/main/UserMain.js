@@ -7,6 +7,8 @@ import { customFetch } from '../components/custom/customFetch';
 import DateGraph from '../components/Inquiry/DateGraph';
 import jwt_decode from 'jwt-decode';
 import hello from '../assets/img/helloman.png';
+import { NavLink } from "react-router-dom";
+import ListItemButton from "@mui/material/ListItemButton";
 
 const UserMain = ({ info }) => {
   const [receive, setReceive] = useState({});
@@ -397,9 +399,21 @@ const UserMain = ({ info }) => {
                 >
                   <Box>입고 현황</Box>
                 </Typography>
-                <a style={{ textDecoration: 'none' }} href="/receive">
-                  <Box sx={{ color: 'gray' }}>자세히</Box>
-                </a>
+                <Box>
+                  <ListItemButton
+                    component={NavLink}
+                    to={"/receive"}
+                    sx={{
+                      padding: 0,
+                      bgcolor: 'transparent',
+                      '&:hover': {
+                        bgcolor: 'transparent',
+                      },
+                    }}
+                  >
+                    <Box sx={{ color: 'gray' }}>자세히</Box>
+                  </ListItemButton>
+                </Box>
               </Box>
 
               <Typography
@@ -501,9 +515,21 @@ const UserMain = ({ info }) => {
                 >
                   <Box>출고 현황</Box>
                 </Typography>
-                <a style={{ textDecoration: 'none' }} href="/release">
-                  <Box sx={{ color: 'gray' }}>자세히</Box>
-                </a>
+                <Box>
+                  <ListItemButton
+                    component={NavLink}
+                    to={"/release"}
+                    sx={{
+                      padding: 0,
+                      bgcolor: 'transparent',
+                      '&:hover': {
+                        bgcolor: 'transparent',
+                      },
+                    }}
+                  >
+                    <Box sx={{ color: 'gray' }}>자세히</Box>
+                  </ListItemButton>
+                </Box>
               </Box>
               <Typography
                 sx={{

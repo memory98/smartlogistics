@@ -39,49 +39,15 @@ const Modal4Outlist = ({
   handleButtonClick,
   details,
   releaseAdd,
+  checkedRow,
   setIsButtonDisabled,
   isButtonDisabled,
   outdetails,
-  updateReceiveCnt }) => {
-  //const isAnyCheckedFalse = data.some(item => item.checked === false);
-  // console.log(outdtail)
-  // console.log("==== data ==== ")
-  // console.log(data);
-  // data: [] === checkedButtons, deleteData: [{}, {}, ...] === rendering되는 state(data)
-  //  const newData = checkedButtons.filter(item => !data.some(deleteItem => deleteItem.no === item));
-  // 
-
-
-  // const [stockcnt, setStockcnt] = useState(0);
-  // const [inputValue, setInputValue] = useState("");
-
-
-  // const handleInputChanges = (no, value) => {
-  //   console.log("뷀유",value);
-  //   setData((prevData) =>
-  //     prevData.map((item) => {
-  //       if (item.no === no) {
-  //         return { ...item, inputValue: value };
-
-
-  //       }
-  //       return item;
-  //     })
-  //   );
-  // };
-
-  // const handleAddButtonClick = () => {
-  //   const inputNumber = parseInt(inputValue);
-  //   if (inputNumber <= stockcnt) {
-  //     setStockcnt(inputNumber);
-  //     setInputValue("");
-  //     // 추가 버튼을 눌렀을 때 stockcnt 값이 입력한 숫자보다 큰 경우에 대한 처리를 여기에 추가
-  //   } else {
-  //     alert("입력한 숫자보다 stockcnt 값이 큽니다.");
-  //   }
-  // };
-  const [selectList, setSelectList] = React.useState([]);
-  const [addList, setAddList] = React.useState([]);
+  updateReceiveCnt,
+  setCheckedRow
+}) => {
+  const [selectList, setSelectList] = useState([]);
+  const [addList, setAddList] = useState([]);
 
   const [checkedButtons, setCheckedButtons] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
@@ -91,52 +57,22 @@ const Modal4Outlist = ({
     let remainedData = data.filter((item) => !item.checked);
     setData(remainedData);
   }
-
-  // const outdata= ()=>{
-  //   if(outdetails.length > 0){
-  //     <Modal4OutItem
-  //     key={detail.no}
-  //     no1={detail.no}
-  //     mcode={detail.masterCode}
-  //     pcode={detail.productCode}
-  //     pname={detail.productName}
-  //     stockcnt={detail.count}
-  //     receivecnt={detail.receivecnt}
-  //     selectedRowData={selectedRowData}
-  //     checked={detail.checked}
-  //     chulgoItemOnChangeCheck={chulgoItemOnChangeCheck}
-  //     checkedButtons={checkedButtons}
-  //     changeHandler={changeHandler}
-  //     data={data}
-  //     setData={setData}
-  //     outdetails={outdetails}
-  //   />
-  //   }
-  // }
-
-
-  //   const filteredRows = checkedRow.filter(row =>
-  //   row.detail.some(detail =>
-  //     data.some(item => item.no === detail.no && detail.state === 't')
-  //   )
-  // );
+  console.log("========== Modal4 Out List Data ==========");
+  console.log(data);
+  console.log(outdetails);
 
   useEffect(() => {
     console.log("111 " + checkedButtons);
   }, [checkedButtons])
 
-  const allCheckBox = (e) => {
-
-    // e.currentTarget.checked;
-    // 체크됐으면 data state에 checked 프로퍼티 true || 해제됐으면 false
-
-    if (e.currentTarget.checked) {
+  const allCheckBox = (checked) => {
+    if (checked) {
       console.log("선택됨")
       const updatedData = data.map(item => ({
         ...item,
         checked: true,
       }));
-      setData(updatedData)
+      setData(updatedData);
     }
     else {
       const updatedData = data.map(item => ({
@@ -172,13 +108,25 @@ const Modal4Outlist = ({
       setCheckedButtons(checkedButtons.filter(el => el !== no));
       console.log('체크 해제 반영 완료');
     }
-
   };
-  // const dataa =Object.assign(data);
-  // console.log(dataa);
-  // const dataas = [dataa];
-  // console.log(dataas);
+  const submitOutitem = () => {
+    console.log('data onClick : ');
+    console.log(data);    // stockcnt - (String)releaseCnt
+    if (data.some((item) => item.releaseCnt === '0')) {
+      console.log('탈출!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+      return;
+    }
+    const newData = data.map(item => {
+      return {...item, stCnt: item.stockcnt - parseInt(item.releaseCnt)}
 
+    });
+    console.log(newData);
+    releaseAdd(newData.filter((itemA) => !details.find((itemB) => itemB.productCode === itemA.productCode)))
+    handleButtonClick('releaseInsert', newData);
+    setData([]);
+  }
+
+  console.log('Object.keys(outdetails[0])', Object.keys(outdetails[0]).length > 0);
   const isAllChecked = data.length > 0 ? data.every(item => item.checked) : false;
   return (
     <Grid item sx={12} md={12} style={{ height: '25%' }}>
@@ -219,16 +167,16 @@ const Modal4Outlist = ({
                       <Checkbox
                         size='small'
                         onChange={(e) => {
-                          // allCheckBox(e.currentTarget.checked);
-                          handleSelectAllClick(e, outdetails, addList, setSelectList);
+                          allCheckBox(e.currentTarget.checked);
+                          // handleSelectAllClick(e, outdetails, addList, setSelectList);
                         }}
                         checked={isAllChecked}
                       />
                     </TableCell>
-                    <TableCell sx={{ width: "10%", backgroundColor: "#F6F7F9" }}>
+                    <TableCell sx={{ width: "15%", backgroundColor: "#F6F7F9" }}>
                       출고번호
                     </TableCell>
-                    <TableCell sx={{ width: "10%", backgroundColor: "#F6F7F9" }}>
+                    <TableCell sx={{ width: "15%", backgroundColor: "#F6F7F9" }}>
                       입고번호
                     </TableCell>
                     <TableCell sx={{ backgroundColor: "#F6F7F9" }}>
@@ -248,49 +196,64 @@ const Modal4Outlist = ({
                 <TableBody >
                   {data.length > 0 || Object.keys(outdetails[0]).length > 0 ? (
                     <>
-                      {data.map((datas) => (
-                        <Modal4OutItem
-                          key={datas.no}
-                          no={datas.no}
-                          receiveCode={datas.mcode}
-                          mcode={""}
-                          pcode={datas.pcode}
-                          pname={datas.pname}
-                          stockcnt={datas.stockcnt}
-                          receivecnt={datas.receivecnt}
-                          selectedRowData={selectedRowData}
-                          checked={datas.checked}
-                          chulgoItemOnChangeCheck={chulgoItemOnChangeCheck}
-                          checkedButtons={checkedButtons}
-                          changeHandler={changeHandler}
-                          data={data}
-                          setData={setData}
-                          outdetails={outdetails}
-                          updateReceiveCnt={updateReceiveCnt}
-                        />
-                      ))}
-                      {outdetails.map((detail) => (
-                        <Modal4OutItem
-                          key={detail.no}
-                          detail={detail}
-                          no={detail.no}
-                          mcode={detail.masterCode || ""}
-                          pcode={detail.productCode}
-                          pname={detail.productName}
-                          stockcnt={detail.count}
-                          receivecnt={detail.receivecnt}
-                          receiveCode={detail.receiveCode}
-                          selectedRowData={selectedRowData}
-                          checked={detail.checked}
-                          chulgoItemOnChangeCheck={chulgoItemOnChangeCheck}
-                          checkedButtons={checkedButtons}
-                          changeHandler={changeHandler}
-                          data={data}
-                          setData={setData}
-                          outdetails={outdetails}
-                          updateReceiveCnt={updateReceiveCnt}
-                        />
-                      ))}
+                      {
+                        data.map((datas, index) => (
+                          <Modal4OutItem
+                            key={index}
+                            index={index}
+                            no={datas.no}
+                            receiveCode={datas.mcode}
+                            mcode={""}
+                            pcode={datas.pcode}
+                            pname={datas.pname}
+                            stockcnt={datas.stockcnt}
+                            receivecnt={datas.receivecnt}
+                            selectedRowData={selectedRowData}
+                            checked={datas.checked}
+                            chulgoItemOnChangeCheck={chulgoItemOnChangeCheck}
+                            checkedButtons={checkedButtons}
+                            changeHandler={changeHandler}
+                            data={data}
+                            setData={setData}
+                            outdetails={outdetails}
+                            children={data}
+                            updateReceiveCnt={updateReceiveCnt}
+                            submitOutitem={submitOutitem}
+                          />
+                        ))}
+                        {
+                          Object.keys(outdetails[0]).length > 0 ? 
+                          <>
+                          {outdetails.map((detail, index) => (
+                            <Modal4OutItem
+                              key={index}
+                              index={index}
+                              detail={detail}
+                              no={detail.no}
+                              mcode={detail.masterCode || ""}
+                              pcode={detail.productCode}
+                              pname={detail.productName}
+                              stockcnt={detail.stockCnt}
+                              cnt={detail.count}
+                              receivecnt={detail.receivecnt}
+                              receiveCode={detail.receiveCode}
+                              selectedRowData={selectedRowData}
+                              checked={detail.checked}
+                              chulgoItemOnChangeCheck={chulgoItemOnChangeCheck}
+                              checkedButtons={checkedButtons}
+                              changeHandler={changeHandler}
+                              data={data}
+                              setData={setData}
+                              outdetails={outdetails}
+                              children={outdetails}
+                              updateReceiveCnt={updateReceiveCnt}
+                              submitOutitem={submitOutitem}
+                            />
+                          ))}
+                          </>
+                          :null
+                        }
+                      
                     </>
                   ) : (
                     <TableRow>
@@ -305,22 +268,13 @@ const Modal4Outlist = ({
           </FormControl>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
+              variant="outlined"
               sx={{
                 mt: 2,
-                color: "#41719C",
-                border: "2px solid #41719C",
-                borderRadius: "5px",
-                float: "right",
-                ":hover": {
-                  color: "#fff",
-                  backgroundColor: "#41719C",
-                },
-                height: "36px",
+                height: '36px',
+                marginLeft: 'auto',
               }}
-              onClick={() => {
-                releaseAdd(data.filter((itemA) => !details.find((itemB) => itemB.productCode === itemA.productCode)))
-                handleButtonClick('releaseInsert', data)
-              }}>
+              onClick={submitOutitem}>
               <strong>등록</strong>
             </Button>
           </Box>

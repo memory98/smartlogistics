@@ -61,6 +61,7 @@ const Register = ({ open, onClose, itemAddHandler }) => {
       name === "" ||
       name.length > 12 ||
       phone === "" ||
+      phone.length < 13 ||
       password !== checkPassword ||
       !/^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{0,12}$/g.test(id) ||
       !/^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z]{9,20}$/g.test(password)
@@ -75,6 +76,7 @@ const Register = ({ open, onClose, itemAddHandler }) => {
       setHasError(true);
       return;
     }
+
     onClickHandler();
   };
 

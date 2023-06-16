@@ -13,6 +13,9 @@ import DeleteDetailModal from '../Modal/DeleteDetailModal';
 import { format } from 'date-fns';
 import dayjs from 'dayjs';
 import { end } from '@popperjs/core';
+import { ConstructionOutlined } from '@mui/icons-material';
+import { faL } from '@fortawesome/free-solid-svg-icons';
+import { set } from 'lodash';
 
 const Receive = () => {
   // ReceiveMaster
@@ -68,6 +71,8 @@ const Receive = () => {
   const [isFetchingDetail, setIsFetchingDetail] = useState(false);
   const limit = 10;
   const scrollend = useRef(false);
+
+  const submitError = useRef('');
   useEffect(() => {
     receiveMasterSearch('load');
   }, []);
@@ -150,14 +155,22 @@ const Receive = () => {
       .then((json) => {
         setreceiveMaster((pre) => [...pre, ...json.data]);
         // 넘어온 데이터의 master code 값 담기
-        setCheckedRow((pre) => [
-          ...pre,
-          ...json.data.map((item) => ({
-            master: item.code,
-            state: 'f',
-            detail: [{ no: '', state: 'f' }],
-          })),
-        ]);
+        setCheckedRow((pre) => {    // pre, json.data가 중복되는 에러가 있어서 중복 제거하고 setCheckedRow
+          const existingCodes = pre.map((item) => item.master);
+          const newData = json.data.filter((item) => !existingCodes.includes(item.code));
+        
+          const updatedData = [
+            ...pre,
+            ...newData.map((item) => ({
+              master: item.code,
+              state: 'f',
+              detail: [{ no: '', state: 'f' }],
+            })),
+          ];
+        
+          return updatedData;
+        });
+        
         if (json.data !== null) {
           loading.current = false;
         }
@@ -321,14 +334,16 @@ const Receive = () => {
       body: JSON.stringify(masterNo),
     }).then((json) => {
       if (!json.data) {
-        alert('입고를 진행 중이거나 완료인 경우에는 삭제를 할 수 없습니다!');
-        toggleModal(true, 'deleteMater');
+        submitError.current = '입고를 진행 중이거나 완료인 경우에는 삭제를 할 수 없습니다.';
+
       } else {
-        setOpenDeleteModalInMaster(false); // 삭제 완료 후 모달창 제거
         setreceiveDetail([{}]); // detail 리스트도 clear
+        setCheckedRow(checkedRow.filter((row) => row.state !== 't'));
         receiveMasterSearch('search'); // master 리스트 update
+        submitError.current = '';
       }
     });
+    return submitError.current;
   };
   // ============================ Delete Handler ============================
   const deleteDetailHandler = async (detail) => {
@@ -355,19 +370,21 @@ const Receive = () => {
       }
 
       if (!json.data) {
-        alert('입고를 진행 중이거나 완료인 경우에는 삭제를 할 수 없습니다!');
-        toggleModal(true, 'deleteDetail');
+        submitError.current = '입고를 진행 중이거나 완료인 경우에는 삭제를 할 수 없습니다!'
       } else {
-        setOpenDeleteModalInDetail(false); // 모달창 제거
-        if (detail.no.length === detail.length) {
+        if (detail.no.length === detail.length) {     // 디테일 다 삭제
           setreceiveDetail([{}]);
-          receiveMasterSearch(null);
+          receiveMasterSearch('search');
+          setDetailInput(false);  // 모두 삭제되고 나면 없애야 함 (detail input창)
+          setCheckedRow(checkedRow.filter((row) => row.master !== detail.masterCode));
         } else {
           setCheckedRow(updatedCheckedRow(detail));
           setreceiveDetail(receiveDetail.filter((d) => !detail.no.includes(d.no)));
         }
+        submitError.current = '';
       }
     } catch (err) {}
+    return submitError.current;
   };
 
   /** Master행 클릭 시 해당하는 detail List를 불러오면서(api) checkedRow state에 데이터를 담는 함수 */
@@ -395,6 +412,46 @@ const Receive = () => {
       }
       return row;
     });
+
+    const modalMessage = () => {  // masterStateT를 사용하지 않은 이유 - delete 작업 후에 우리가 checkedRow만 update 해줘서
+      const length = checkedRow.filter((row) => row.state === 't').length;
+      console.log("===modalMessage 확인 ===== ");
+      console.log(checkedRow);
+      console.log(length);
+      // if (submitError.current != '') {
+      //   return submitError.current;
+      // }
+      if (receiveMaster.length === length) {
+        return '입고 기록 전체를 삭제하시겠습니까?';
+      }
+      if (length === 0) {
+        return 0;
+      }
+      if (length === 1) {
+        console.log(masterStateT);
+        return masterStateT[0] + '을 삭제하시겠습니까?';
+      }
+      return length + '개의 입고 정보를 삭제하시겠습니까?';
+    };
+
+    const modalDetailMessage = () => {
+      const length = deleteObj.no.length;
+      // if (submitError.current != '') {
+      //   return submitError.current;
+      // }
+      if (receiveDetail.length === length) {
+        return deleteObj.masterCode + '의 기록 전체를 삭제하시겠습니까?';
+      }
+      if (length === 0) {
+        return 0;
+      }
+      if (length === 1) {
+        console.log(deleteObj);
+        return deleteObj.no[0] + '을 삭제하시겠습니까?';
+      }
+      return length + '개의 정보를 삭제하시겠습니까?';
+    };
+
   return (
     <Box>
       <ManagerModal open={openManager} onClose={() => setOpenManager(false)} handleButtonClick={handleButtonClick} />
@@ -440,6 +497,8 @@ const Receive = () => {
           masterStateT={masterStateT}
           loading={loading}
           receiveMasterSearch={receiveMasterSearch}
+          modalMessage={modalMessage}
+          deleteMasterHandler={deleteMasterHandler}
         />
         <ReceiveDetail
           details={receiveDetail}
@@ -454,6 +513,9 @@ const Receive = () => {
           openNullModal={openNullModal}
           detailInput={detailInput}
           setCountCheck={setCountCheck}
+          modalDetailMessage={modalDetailMessage}
+          deleteDetailHandler={deleteDetailHandler}
+          deleteObj={deleteObj}
         />
       </Grid>
     </Box>

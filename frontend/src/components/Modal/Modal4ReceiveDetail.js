@@ -50,31 +50,12 @@ const Modal4ReceiveDetail = ({
   graybutton
 }) => {
 
-  //  console.log("간다이이잉",details);
 
   const [allCheckboxesDisabled, setAllCheckboxesDisabled] = useState(false);
 
   const handleAllCheckboxesDisabled = (disabled) => {
     setAllCheckboxesDisabled(disabled);
   };
-
-
-
-  // const isDisabled = (no2) => {
-  //   const item = details.find((item) => item.no === no2);
-  //   console.log("첵첵",details,item);
-  //   // item.checked 값이 true인 경우 disabled 속성을 설정함
-  //   if (item && item.checked) {
-  //     console.log(true);
-  //     return true;
-  //   }
-  //   console.log(false);
-  //   return false;
-
-  // };
-
-
-
 
   details[0] !== undefined ? console.log("1111", details[0].masterCode) : null;
   const detailAllCheckBox = (checked) => {
@@ -98,9 +79,6 @@ const Modal4ReceiveDetail = ({
       details.some(item => item.no === detail.no && detail.state === 't')
     )
   );
-
-
-
 
   const disabledchecked = (no) => {
     const updatedData = modal4receiveDetail.map((item) => {
@@ -156,7 +134,7 @@ const Modal4ReceiveDetail = ({
               <Table stickyHeader size="small">
                 <TableHead>
                   <TableRow sx={{ height: 3 }}>
-                    <TableCell sx={{ width: "5%", backgroundColor: "#F6F7F9", p: 0, }}>
+                    <TableCell sx={{ width: "5%", backgroundColor: "#F6F7F9", p: 0 }}>
                       <Checkbox
                         size="small"
                         onChange={(e) => {
@@ -191,8 +169,8 @@ const Modal4ReceiveDetail = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {details.length > 0 ? (
-                    details.map((detailss, index) => (
+                  {details.length > 0 && details.filter(item => item.stockCount> 0).length > 0? (
+                    details.filter(item => item.stockCount> 0).map((detailss, index) => (
                       <Modal4DetailItem
                         key={index}
                         index={index}
@@ -215,21 +193,15 @@ const Modal4ReceiveDetail = ({
                         textClick={textClick}
                         modal4receiveDetail={modal4receiveDetail}
                         setreceiveDetail={setreceiveDetail}
-                        // isDisabled={isDisabled}
-                        // isButtonDisabled={isButtonDisabled}
-                        // setIsButtonDisabled={setIsButtonDisabled}
                         graybutton={graybutton}
                         disabled={detailss.disabled}
                         isInChulgo={detailss.isInChulgo}
-
-
-
                       />
                     ))
                   ) : (
                     <TableRow>
                       <TableCell colSpan={10} sx={{ textAlign: "center" }}>
-                        선택한 입고의 품목이 없습니다.
+                        선택한 입고에 출고할 수 있는 품목이 없습니다.
                       </TableCell>
                     </TableRow>
                   )}
@@ -239,20 +211,18 @@ const Modal4ReceiveDetail = ({
           </FormControl>
           <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
+              variant="outlined"
               sx={{
                 mt: 2,
-                color: "#41719C",
-                border: "2px solid #41719C",
-                borderRadius: "5px",
-                float: "right",
-                ":hover": {
-                  color: "#fff",
-                  backgroundColor: "#41719C",
-                },
-                height: "36px",
+                height: '36px',
+                marginLeft: 'auto',
               }}
-              onClick={() => multiClicks(pumokList)}
-            >
+              onClick={() => {
+                // const data = (입고 품목(details) && stockCnt > 0) - 출고 품목(outdetails)
+                // 입고 품목의 no === 출고 품목의 no 한 데이터를 빼주기
+                const stockCntNotZeroData = pumokList.filter(item => item.stockCount> 0);
+                multiClicks(stockCntNotZeroData);
+              }}>
               <strong>추가</strong>
             </Button>
           </Box>

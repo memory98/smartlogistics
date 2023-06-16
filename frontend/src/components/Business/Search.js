@@ -41,7 +41,7 @@ function Search({ textHandleChanges }) {
         <span
           style={{
             backgroundColor: '#EBF2FF',
-            padding: '3px',
+            padding: '2px 5px 4.5px 0',
           }}
         >
           <span
@@ -93,7 +93,7 @@ function Search({ textHandleChanges }) {
           />
 
           <label htmlFor="bphone" style={{ fontSize: '0.9rem' }}>
-            번호
+            연락처
           </label>
           <TextField
             id="bphone"
